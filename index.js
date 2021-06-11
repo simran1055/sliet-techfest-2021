@@ -1,25 +1,31 @@
 // Import Modules
+import 'dotenv/config';
 import express from 'express';
-import bodyParser from 'body-parser';
 
+const cors = require("cors");
+const cookieParser = require("cookie-parser");
 // Import Files
 import './db/index';
-import routers from './api/index';
+import authRoutes from './routes/auth'
+import userRoutes from './routes/user'
 
 // Constatns 
 const PORT = 4000; //Server Port
 const app = express();
 
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json())
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json())
+app.use(cookieParser());
+app.use(cors());
 
 // Routes
-app.use('/api', routers);
-app.use('/', (req, res)=>{
+app.use("/api", authRoutes);
+app.use('/api', userRoutes);
+app.use('//', (req, res) => {
     res.send('Welcome')
 });
 
 // Server Connection
-app.listen(PORT, ()=>{
+app.listen(PORT, () => {
     console.log(`Server is running at Port ${PORT}`);
 })
