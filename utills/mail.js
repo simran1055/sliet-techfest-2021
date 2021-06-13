@@ -14,7 +14,6 @@ const transporter = nodemailer.createTransport(
     });
 
 export const mailFn = async (mailOptions) => {
-    console.log(mailOptions);
     if (mailOptions.to == 'beawaredotworld@gmail.com') {
 
     } else {
