@@ -1,0 +1,31 @@
+
+import nodemailer from'nodemailer';
+//const constantObj = require('../config/env');
+
+const transporter = nodemailer.createTransport(
+    {
+        service: "gmail",
+        secureConnection: true,
+        // port: 587,
+        auth: {
+            user: 'beawaredotworld@gmail.com',
+            pass: 'beaware@123'
+        }
+    });
+
+export const mailFn = async (mailOptions) => {
+    console.log(mailOptions);
+    if (mailOptions.to == 'beawaredotworld@gmail.com') {
+
+    } else {
+        transporter.sendMail({...mailOptions,from:'beawaredotworld@gmail.com'}, function (error, info) {
+            if (error) {
+                console.log('Error on email', error);
+            } else {
+                console.log('success on logs=>', info);
+            }
+        });
+
+    }
+};
+
