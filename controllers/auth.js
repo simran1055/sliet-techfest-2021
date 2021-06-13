@@ -6,11 +6,8 @@ import { mailFn } from '../utills/mail';
 import { successAction, failAction } from "../utills/response"
 import message from '../utills/messages'
 
-
-
 var jwt = require('jsonwebtoken');
 var expressJwt = require('express-jwt');
-
 
 exports.signUp = async (req, res) => {
     const errors = validationResult(req);
