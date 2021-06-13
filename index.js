@@ -10,7 +10,7 @@ import authRoutes from './routes/auth'
 import userRoutes from './routes/user'
 
 // Constatns 
-const PORT = 4000; //Server Port
+const PORT = process.env.PORT || 4000; //Server Port
 const app = express();
 
 app.use(express.urlencoded({ extended: true }));
