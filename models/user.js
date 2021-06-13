@@ -30,6 +30,14 @@ const userSchema = new mongoose.Schema({
         type: Number,
         default: 0
     },
+    verificationCode: {
+        type: String,
+        default: 0
+    },
+    isVerified: {
+        type: Boolean,
+        default: false
+    }
 });
 
 userSchema.virtual("password").set(function (password) {
