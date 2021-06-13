@@ -80,7 +80,7 @@ exports.notify = async (req, res) => {
             `
         })
 
-        res.json(successAction(context,'Successfully'))
+        res.json(successAction(context, 'Successfully'))
     })
 
 }

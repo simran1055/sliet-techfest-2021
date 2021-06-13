@@ -19,7 +19,9 @@ exports.signUp = async (req, res) => {
     }
 
     // if (await User.findOne({ name: req.body.name })) return res.status(400).json(failAction('Name is already registerd'));
-    if (await User.findOne({ email: req.body.email })) return res.status(400).json(failAction('Email is already registerd'));
+    if (await User.findOne({ email: req.body.email })) {
+        return res.status(400).json(failAction('Email is already registerd'));
+    }
     let payload = {
         ...req.body, ...{
             verificationCode: uuidv4()
@@ -123,7 +125,7 @@ exports.verify = async (req, res) => {
             return res.json(failAction('User not found.'))
         }
 
-        if(user.isVerified){
+        if (user.isVerified) {
             return res.json(successAction('User already Verified.'))
         }
 
@@ -145,7 +147,7 @@ exports.verify = async (req, res) => {
         else {
             return res.json(failAction('Varification Faild'))
         }
-        
+
     })
 }
 
@@ -162,14 +164,11 @@ exports.signOut = (req, res) => {
 exports.isSignedIn = expressJwt({
     secret: process.env.SECRET,
     userProperty: "auth",
-    algorithms: ['HS256']
+    algorithms: ['RS256', 'HS256']
 });
 
 exports.isAuthenticated = (req, res, next) => {
-    console.log("AUTH: " + req.auth._id)
-
-    console.log("PROF: " + req.profile._id)
-    let checker = req.profile && req.auth && req.auth._id == req.profile._id;
+    let checker = req.profile && req.auth && req.auth._id === req.profile._id;
 
     if (!checker) {
         res.status(403).json({
