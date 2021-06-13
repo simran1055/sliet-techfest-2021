@@ -1,7 +1,10 @@
-import User from "../models/user";
-import { successAction, failAction } from "../utills/response"
 import { check, cookie, validationResult } from "express-validator";
 import { v4 as uuidv4 } from 'uuid';
+
+import User from "../models/user";
+import { mailFn } from '../utills/mail';
+import { successAction, failAction } from "../utills/response"
+import message from '../utills/messages'
 
 
 
@@ -28,6 +31,7 @@ exports.signUp = async (req, res) => {
 
     user1.save((err, user) => {
         if (err) {
+            console.log(err);
             return res.status(400).json(
                 failAction("Not able to Sign Up. Some error ocuured")
             )
@@ -37,7 +41,7 @@ exports.signUp = async (req, res) => {
             to: req.body.email,
             subject: message.verificaton,
             html: `<h1>Thanks for REgistration ${user.name}</h1>
-                <p> <a href="https://test.movieshunters.com/&vc=${user.verificationCode}?id=${user.id}"> Please Click here to verify </a></p>
+                <p> <a href="https://sliet.movieshunters.com?vc=${user.verificationCode}?id=${user.id}"> Please Click here to verify </a></p>
             `
         })
 
@@ -70,6 +74,11 @@ exports.signIn = (req, res) => {
             return res.status(400).json(
                 failAction("Email Id not registered with us.")
             )
+        }
+
+        if(!user.isVerified)
+        {
+            return res.json(failAction('User is not verified. Please Verify you email.'))
         }
 
         if (!user.authenticate(password)) {
