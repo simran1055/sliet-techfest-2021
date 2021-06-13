@@ -4,7 +4,9 @@ import { getUserById, getUser, updateUser, notify } from "../controllers/user"
 import { isAuthenticated, isSignedIn, isAdmin } from "../controllers/auth"
 
 router.param('userId', getUserById);
+// router.get('/user/:userId', isSignedIn, isAuthenticated, isVerified, getUser);
 router.get('/user/:userId', isSignedIn, isAuthenticated, getUser);
+// router.get('/user/:userId', isSignedIn, isAuthenticated, isVerified, updateUser);
 router.put('/user/:userId', isSignedIn, isAuthenticated, updateUser);
 router.post('/user/notify', notify)
 
