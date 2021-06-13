@@ -2,7 +2,7 @@ import express from 'express';
 var router = express.Router()
 import { check } from "express-validator"
 
-import { signIn, signUp, signOut } from '../controllers/auth.js';
+import { signIn, signUp, signOut, verify } from '../controllers/auth.js';
 router.post(
     "/signup",
     [
@@ -22,6 +22,7 @@ router.post("/signin", [
     })
 ], signIn);
 
+router.post("/verify", verify);
 
 router.get("/signout", signOut);
 

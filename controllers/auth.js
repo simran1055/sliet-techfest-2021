@@ -20,9 +20,11 @@ exports.signUp = async (req, res) => {
 
     // if (await User.findOne({ name: req.body.name })) return res.status(400).json(failAction('Name is already registerd'));
     if (await User.findOne({ email: req.body.email })) return res.status(400).json(failAction('Email is already registerd'));
-    let payload = { ...req.body, ...{
-        verificationCode : uuidv4()
-    } }
+    let payload = {
+        ...req.body, ...{
+            verificationCode: uuidv4()
+        }
+    }
 
     const user1 = new User(payload);
 
@@ -38,7 +40,7 @@ exports.signUp = async (req, res) => {
             to: req.body.email,
             subject: message.verificaton,
             html: `<h1>Thanks for REgistration ${user.name}</h1>
-                <p> <a href="https://sliet.movieshunters.com?vc=${user.verificationCode}?id=${user.id}"> Please Click here to verify </a></p>
+                <p> <a href="https://sliet.movieshunters.com?vf=${user.verificationCode}?id=${user.id}"> Please Click here to verify </a></p>
             `
         })
 
@@ -73,8 +75,7 @@ exports.signIn = (req, res) => {
             )
         }
 
-        if(!user.isVerified)
-        {
+        if (!user.isVerified) {
             return res.json(failAction('User is not verified. Please Verify you email.'))
         }
 
@@ -98,7 +99,7 @@ exports.signIn = (req, res) => {
         res.json(
             successAction({
                 token,
-                user: { _id, email, name, role }
+                user: { _id, email, name, role, isVerified }
             })
         )
     })
@@ -106,6 +107,47 @@ exports.signIn = (req, res) => {
 
 }
 
+exports.verify = async (req, res) => {
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+        return res.status(422).json({
+            error: errors.array()[0].msg
+        })
+    }
+
+    const { vf, id } = req.body;
+    User.findOne({ _id: id }, (err, user) => {
+
+        if (err) {
+            return res.json(failAction('User not found.'))
+        }
+
+        if(user.isVerified){
+            return res.json(successAction('User already Verified.'))
+        }
+
+        if (user.verificationCode == vf) {
+            User.findByIdAndUpdate(
+                { _id: id },
+                { $set: { isVerified: true } },
+                (err, user) => {
+                    if (err) {
+                        return res.status(400).json(failAction('Varification Faild'))
+                    }
+                    let { _id, email, name, role } = user;
+                    return res.json(successAction({
+                        user: { _id, email, name, role, isVerified: true }
+                    }))
+                }
+            )
+        }
+        else {
+            return res.json(failAction('Varification Faild'))
+        }
+        
+    })
+}
 
 exports.signOut = (req, res) => {
     res.clearCookie("token");
