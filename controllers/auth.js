@@ -77,6 +77,8 @@ exports.signIn = (req, res) => {
             )
         }
 
+
+        // we can remove this and use middle ware also
         if (!user.isVerified) {
             return res.json(failAction('User is not verified. Please Verify you email.'))
         }
@@ -96,7 +98,7 @@ exports.signIn = (req, res) => {
 
         //send response to frontend
 
-        const { _id, email, name, role } = user;
+        const { _id, email, name, role, isVerified } = user;
 
         res.json(
             successAction({
@@ -135,7 +137,7 @@ exports.verify = async (req, res) => {
                 { $set: { isVerified: true } },
                 (err, user) => {
                     if (err) {
-                        return res.status(400).json(failAction('Varification Faild'))
+                        return res.status(400).json(failAction('Verification Failed'))
                     }
                     let { _id, email, name, role } = user;
                     return res.json(successAction({
@@ -145,7 +147,7 @@ exports.verify = async (req, res) => {
             )
         }
         else {
-            return res.json(failAction('Varification Faild'))
+            return res.json(failAction('Verification Faild'))
         }
 
     })
@@ -164,23 +166,41 @@ exports.signOut = (req, res) => {
 exports.isSignedIn = expressJwt({
     secret: process.env.SECRET,
     userProperty: "auth",
-    algorithms: ['RS256', 'HS256']
+    algorithms: ['HS256']
 });
 
 exports.isAuthenticated = (req, res, next) => {
-    let checker = req.profile && req.auth && req.auth._id === req.profile._id;
-
+    let checker = req.profile && req.auth && req.auth._id == req.profile._id;
+    console.log(req.auth)
     if (!checker) {
         res.status(403).json({
-            error: "Access Denied"
+            error: "Access Denied , Not authenticated"
         })
     }
     next();
 }
 
 
+
+///middle ware for isverified
+// exports.isVerified = (req, res, next) => {
+//     User.findById(req.auth._id).exec((err, user) => {
+//         if (err || !user) {
+//             return res.status(400).json({
+//                 error: "Error while fetching user"
+//             })
+//         }
+
+//         if (user.isVerified != 1) return res.status(400).json(failAction('Verification Failed'))
+//         next();
+//     })
+
+
+// }
+
+
 exports.isAdmin = (req, res, next) => {
-    if (req.profile.role === 0) {
+    if (req.profile.role == 0) {
         res.status(403).json({
             error: "You are not admin, ACCESS DENIED"
         })
