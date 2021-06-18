@@ -20,6 +20,47 @@ const userSchema = new mongoose.Schema({
         unique: true,
 
     },
+    phone: {
+        type: String,
+        maxlength: 15,
+        trim: true,
+        unique: true
+    },
+    designation: {
+        type: String,
+        maxlength: 30,
+        trim: true
+    },
+    collegeName: {
+        type: String,
+        maxlength: 200,
+        trim: true
+    },
+    regNo: {
+        /// Only for sliet students just to keep record
+        type: String,
+        maxlength: 10,
+        trim: true
+    },
+    collegeAddress: {
+        type: String,
+        maxlength: 200,
+        trim: true
+    },
+    courseEnrolled: {
+        // BSC, BTech etc
+        type: String,
+        maxlength: 100,
+        trim: true
+    },
+    branchOfStudy: {
+        type: String,
+        maxlength: 100,
+        trim: true
+    },
+    studyYear: {
+        type: Number,
+    },
     encryPassword: {
         type: String,
         required: true
@@ -37,7 +78,12 @@ const userSchema = new mongoose.Schema({
     isVerified: {
         type: Boolean,
         default: false
+    },
+    isProfileComplete: {
+        type: Boolean,
+        default: 0
     }
+
 });
 
 userSchema.virtual("password").set(function (password) {
