@@ -22,9 +22,28 @@ exports.signUp = async (req, res) => {
     if (await User.findOne({ email: req.body.email })) {
         return res.status(400).json(failAction('Email is already registerd'));
     }
-    let payload = {
-        ...req.body, ...{
-            verificationCode: uuidv4()
+
+    var emailAr = req.body.email.split("@");
+    var use = emailAr[0];
+    var domain = emailAr[1];
+    var payload;
+    if (domain == "sliet.ac.in") {
+        let collegeName = "Sant Longowal Institute of Engineering and Technology";
+        let regNo = use;
+
+        payload = {
+            ...req.body, ...{
+                verificationCode: uuidv4(),
+                collegeName,
+                regNo
+            }
+        }
+    } else {
+
+        payload = {
+            ...req.body, ...{
+                verificationCode: uuidv4()
+            }
         }
     }
 
