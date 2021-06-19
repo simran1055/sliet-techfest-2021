@@ -26,6 +26,22 @@ const userSchema = new mongoose.Schema({
         trim: true,
         unique: true
     },
+    whatsappPhoneNumber: {
+        type: String,
+        maxlength: 15,
+        trim: true,
+        unique: true
+    },
+    telegramPhoneNumber: {
+        type: String,
+        maxlength: 15,
+        trim: true,
+        unique: true
+    },
+    dob: {
+        type: Date,
+        trim: true,
+    },
     designation: {
         type: String,
         maxlength: 30,
@@ -58,7 +74,7 @@ const userSchema = new mongoose.Schema({
         maxlength: 100,
         trim: true
     },
-    studyYear: {
+    yearOfStudy: {
         type: Number,
     },
     encryPassword: {
