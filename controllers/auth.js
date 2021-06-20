@@ -61,7 +61,7 @@ exports.signUp = async (req, res) => {
             to: req.body.email,
             subject: message.verificaton,
             html: `<h1>Thanks for REgistration ${user.name}</h1>
-                <p> <a href="https://sliet.movieshunters.com?vf=${user.verificationCode}?id=${user.id}"> Please Click here to verify </a></p>
+                <p> <a href="https://sliet.movieshunters.com?vf=${user.verificationCode}?id=${user._id}"> Please Click here to verify </a></p>
             `
         })
 
