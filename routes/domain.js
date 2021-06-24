@@ -3,7 +3,7 @@ var router = express.Router()
 import { check } from "express-validator"
 import { getUserById, getUser, updateUser, notify } from "../controllers/user"
 import { isAuthenticated, isSignedIn, isSuperAdmin } from "../controllers/auth"
-import { getDomainById, getDomain, createDomain, deleteDomain, updateDomain, getAllDomains } from "../controllers/domain"
+import { getDomainById, getDomain, createDomain, deleteDomain, updateDomain, getAllDomains, photo } from "../controllers/domain"
 
 
 router.param('userId', getUserById);
@@ -31,3 +31,6 @@ router.delete(
     isSuperAdmin,
     deleteDomain
 );
+
+router.get("/domain/photo/:domainId", photo);
+export default router;

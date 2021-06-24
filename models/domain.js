@@ -29,7 +29,7 @@ const domainSchema = new mongoose.Schema({
         type: String,
         required: true,
         trim: true,
-        unique: true,
+
     },
     facultyCoordinatorName: {
         type: String,
@@ -46,8 +46,11 @@ const domainSchema = new mongoose.Schema({
         maxlength: 32,
     },
     photo: {
-        data: Buffer,
-        contentType: String
+        // data: Buffer,
+        // contentType: String
+        type: String,
+        required: true,
+        trim: true,
     }
 })
 

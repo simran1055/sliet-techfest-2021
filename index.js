@@ -8,6 +8,7 @@ const cookieParser = require("cookie-parser");
 import './db/index';
 import authRoutes from './routes/auth'
 import userRoutes from './routes/user'
+import domainRoutes from './routes/domain'
 
 // Constatns 
 const PORT = process.env.PORT || 4000; //Server Port
@@ -21,6 +22,7 @@ app.use(cors());
 // Routes
 app.use("/api", authRoutes);
 app.use('/api', userRoutes);
+app.use('/api', domainRoutes);
 app.use('//', (req, res) => {
     res.send('Welcome')
 });
