@@ -6,7 +6,7 @@ const cors = require("cors");
 const cookieParser = require("cookie-parser");
 // Import Files
 import './db/index';
-import sponsors from './routes/sponsor';
+import sponsorRoutes from './routes/sponsor';
 import authRoutes from './routes/auth'
 import userRoutes from './routes/user'
 
@@ -22,7 +22,7 @@ app.use(cors());
 // Routes
 app.use("/api", authRoutes);
 app.use('/api', userRoutes);
-app.use('/api', sponsors);
+app.use('/api', sponsorRoutes);
 app.use('//', (req, res) => {
     res.send('Welcome')
 });

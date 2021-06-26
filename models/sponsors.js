@@ -5,14 +5,12 @@ const SponsorSchema = new mongoose.Schema({
         type: String,
         required: true,
         trim: true,
-        unique: true
 
     },
     orgEmail: {
         type: String,
         required: true,
         trim: true,
-        unique: true
     },
     socialMedia: [
         {
@@ -37,7 +35,6 @@ const SponsorSchema = new mongoose.Schema({
     website:{
         type: String,
         trim: true,
-        unique: true
     },
     description:{
         type: String,

@@ -1,7 +1,7 @@
 import express from 'express';
 var router = express.Router();
 import { check } from "express-validator"
-import { sponsorsList, addSponsor } from "../controllers/sponsor"
+import { sponsorsList, addSponsor, profileUpdate } from "../controllers/sponsor"
 import { isAuthenticated, isSignedIn, isAdmin } from "../controllers/auth"
 
 router.post('/add-sponsors',
@@ -10,8 +10,9 @@ router.post('/add-sponsors',
         check("orgEmail", "Organization email is required").isEmail()
     ],
     addSponsor);
-    
+
 router.get('/sponsors-list', sponsorsList);
 
+router.post('/sponsors-profile-update', profileUpdate)
 
 export default router;
