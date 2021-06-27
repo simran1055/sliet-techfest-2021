@@ -18,6 +18,7 @@ exports.getUserById = (req, res, next, id) => {
     })
 }
 
+
 exports.getUser = (req, res) => {
     req.profile.salt = undefined
     req.profile.encryPassword = undefined
@@ -59,6 +60,7 @@ exports.notify = async (req, res) => {
 
     subscriber.save((err, subscriber) => {
         if (err) {
+
             return res.status(400).json(
                 failAction("Some error ocuured")
             )

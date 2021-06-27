@@ -9,6 +9,7 @@ import './db/index';
 import authRoutes from './routes/auth'
 import userRoutes from './routes/user'
 import domainRoutes from './routes/domain'
+import coordinatorRoutes from './routes/coordinator'
 
 // Constatns 
 const PORT = process.env.PORT || 4000; //Server Port
@@ -23,6 +24,7 @@ app.use(cors());
 app.use("/api", authRoutes);
 app.use('/api', userRoutes);
 app.use('/api', domainRoutes);
+app.use('/api', coordinatorRoutes);
 app.use('//', (req, res) => {
     res.send('Welcome')
 });
