@@ -1,8 +1,11 @@
-import express from 'express';
 var router = express.Router()
+
+import Joi from 'joi';
+import express from 'express';
 import { check } from "express-validator"
 
 import { signIn, signUp, signOut, verify } from '../controllers/auth.js';
+
 router.post(
     "/signup",
     [
