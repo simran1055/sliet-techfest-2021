@@ -4,20 +4,15 @@
   "description": "Sliet Fest 2021",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon --exec babel-node index.js",
-    "build": "babel . -d dist --ignore node_modules --out-dir dist && cp -R views dist && cp .env dist && cp -R public dist",
-    "serve": "NODE_ENV=production pm2 start dist/index.js --name=index"
+    "start": "nodemon --exec babel-node app.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@babel/node": "^7.14.7",
-    "@babel/preset-env": "^7.14.4",
     "@hapi/joi": "^17.1.1",
-    "body-parser": "^1.19.0",
     "cookie-parser": "^1.4.5",
     "cors": "^2.8.5",
+    "cross-env": "^7.0.3",
     "crypto": "^1.0.1",
     "dotenv": "^10.0.0",
     "express": "^4.17.1",
@@ -31,11 +26,14 @@
     "md5": "^2.3.0",
     "mongoose": "^5.12.12",
     "nodemailer": "^6.6.1",
-    "nodemon": "^2.0.7",
     "uuid": "^8.3.2"
   },
   "devDependencies": {
     "@babel/cli": "^7.14.5",
-    "@babel/core": "^7.14.6"
+    "@babel/core": "^7.14.6",
+    "@babel/node": "^7.14.7",
+    "@babel/preset-env": "^7.14.7",
+    "babel-cli": "^6.26.0",
+    "nodemon": "^2.0.7"
   }
 }
