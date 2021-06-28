@@ -32,7 +32,7 @@ const coordinatorchema = new mongoose.Schema({
         // data: Buffer,
         // contentType: String
         type: String,
-        required: true,
+
         trim: true,
     }
 })
