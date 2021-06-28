@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-
+const { ObjectId } = mongoose.Schema;
 const domainSchema = new mongoose.Schema({
     domainName: {
         type: String,
@@ -13,38 +13,8 @@ const domainSchema = new mongoose.Schema({
         required: true,
         maxlength: 2000
     },
-    studentCoordinatorName: {
-        type: String,
-        required: true,
-        maxlength: 32,
-        trim: true
-    },
-    studentCoordinatorPhone: {
-        type: String,
-        required: true,
-        maxlength: 15,
-        trim: true
-    },
-    studentCoordinatorEmail: {
-        type: String,
-        required: true,
-        trim: true,
-
-    },
-    facultyCoordinatorName: {
-        type: String,
-        required: true,
-        trim: true,
-
-        maxlength: 32,
-    },
-    facultyCoordinatorDesignation: {
-        type: String,
-        required: true,
-        trim: true,
-
-        maxlength: 32,
-    },
+    studentCoordinator: [{ type: ObjectId, ref: 'Coordinator' }],
+    facultyCoordinator: [{ type: ObjectId, ref: 'Coordinator' }],
     photo: {
         // data: Buffer,
         // contentType: String

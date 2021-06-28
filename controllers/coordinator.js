@@ -1,24 +1,24 @@
-import Domain from '../models/domain'
+import Coordinator from '../models/coordinator'
 import { successAction, failAction } from '../utills/response'
 const formidable = require("formidable");
 import fs from "fs"
 import path from "path"
 import _ from "lodash";
 
-exports.getDomainById = (req, res, next, id) => {
-    Domain.findById(id).populate('studentCoordinator').populate('facultyCoordinator').exec((err, domain1) => {
-        if (err || !domain1) {
+exports.getCoordinatorById = (req, res, next, id) => {
+    Coordinator.findById(id).exec((err, coordinator1) => {
+        if (err || !coordinator1) {
             return res.status(400).json({
-                error: "Error while fetching Domain"
+                error: "Error while fetching Coordinator"
             })
         }
 
-        req.domain1 = domain1
+        req.coordinator1 = coordinator1
         next();
     })
 }
 
-exports.createDomain = (req, res) => {
+exports.createCoordinator = (req, res) => {
     let form = new formidable.IncomingForm();
     form.keepExtensions = true;
 
@@ -27,32 +27,22 @@ exports.createDomain = (req, res) => {
             return res.status(400).json(failAction("problem with something in form "))
         }
 
-        const { domainName,
-            domainDescription,
-            studentCoordinator,
-            facultyCoordinator,
-        } = fields;
+        const { coordinatorName,
 
-        if (!domainName || !domainDescription || !studentCoordinator || !facultyCoordinator) {
+            coordinatorPhone,
+            coordinatorEmail,
+            coordinatorType,
+
+            coordinatorDesignation } = fields;
+
+        if (!coordinatorName || !coordinatorPhone || !coordinatorEmail || !coordinatorType || (coordinatorType == "Faculty" && !coordinatorDesignation)) {
             // fs.unlinkSync(newPath);
             return res.status(400).json({
                 error: "Please include all the fields"
             });
         }
 
-
-        let studentCoordinatorArray = studentCoordinator.split(",");
-
-        let facultyCoordinatorArray = facultyCoordinator.split(",");
-
-
-
-        let domain1 = new Domain({
-            domainName,
-            domainDescription,
-            studentCoordinator: studentCoordinatorArray,
-            facultyCoordinator: facultyCoordinatorArray,
-        });
+        let coordinator1 = new Coordinator(fields);
 
         if (file.photo) {
             if (file.photo.size > 3000000) {
@@ -89,8 +79,8 @@ exports.createDomain = (req, res) => {
 
 
         }
-        domain1.photo = newPath;
-        domain1.save((err, domain1) => {
+        coordinator1.photo = newPath;
+        coordinator1.save((err, coordinator1) => {
             if (err) {
 
                 try {
@@ -99,13 +89,13 @@ exports.createDomain = (req, res) => {
                     console.log("file not found")
                 }
                 return res.status(400).json({
-                    error: "domain not saved in db, some error occured"
+                    error: "coordinator not saved in db, some error occured"
                 })
             }
 
             res.json({
-                message: "domain added successfully",
-                domain1
+                message: "coordinator added successfully",
+                coordinator1
             })
         })
 
@@ -116,34 +106,34 @@ exports.createDomain = (req, res) => {
     })
 }
 
-exports.getDomain = (req, res) => {
-    req.domain1.photo = undefined;
-    return res.json(req.domain1)
+exports.getCoordinator = (req, res) => {
+    req.coordinator1.photo = undefined;
+    return res.json(req.coordinator1)
 }
 
 //middleware
 exports.photo = (req, res, next) => {
-    if (req.domain1.photo) {
-        // res.set("Content-Type", req.domain1.photo.contentType);
-        return res.send(req.domain1.photo);
+    if (req.coordinator1.photo) {
+        // res.set("Content-Type", req.coordinator1.photo.contentType);
+        return res.send(req.coordinator1.photo);
     }
     next();
 };
 ////////
-exports.getAllDomains = (req, res) => {
+exports.getAllCoordinators = (req, res) => {
     // let limit = req.query.limit ? parseInt(req.query.limit) : 8;
     // let sortBy = req.query.sortBy ? req.query.sortBy : "_id";
-    Domain.find().populate('studentCoordinator').populate('facultyCoordinator').exec((err, domains) => {
+    Coordinator.find().exec((err, coordinators) => {
         if (err) {
             return res.status(400).json({
-                error: "No Domain Found"
+                error: "No Coordinator Found"
             });
         }
-        res.json(domains);
+        res.json(coordinators);
     });
 }
 
-exports.updateDomain = (req, res) => {
+exports.updateCoordinator = (req, res) => {
     let form = new formidable.IncomingForm();
     form.keepExtensions = true;
     form.parse(req, (err, fields, file) => {
@@ -155,41 +145,15 @@ exports.updateDomain = (req, res) => {
         }
 
         //updation
-        let domain1 = req.domain1;
+        let coordinator1 = req.coordinator1;
 
-        const { domainName,
-            domainDescription,
-            studentCoordinator,
-            facultyCoordinator,
-        } = fields;
-
-
-
-        domain1 = _.extend(domain1, fields);
-
-        console.log(facultyCoordinator)
-
-
-        if (studentCoordinator) {
-            let studentCoordinatorArray = studentCoordinator.split(",");
-            domain1.studentCoordinator = studentCoordinatorArray
-        }
-        //  else {
-        //     domain1.depopulate("studentCoordinator")
-        // }
-
-        if (facultyCoordinator) {
-            let facultyCoordinatorArray = facultyCoordinator.split(",");
-            domain1.facultyCoordinator = facultyCoordinatorArray
-        }
-        // else {
-        //     domain1.depopulate("facultyCoordinator")
-        // }
+        coordinator1 = _.extend(coordinator1, fields);
+        console.log(fields);
 
         //handle file here
         if (file.photo) {
             try {
-                fs.unlinkSync(domain1.photo);
+                fs.unlinkSync(coordinator1.photo);
             } catch (err) {
                 console.log("file not found")
             }
@@ -217,13 +181,13 @@ exports.updateDomain = (req, res) => {
             })
 
 
-            domain1.photo = newPath;
+            coordinator1.photo = newPath;
 
         }
 
         // //save to db
 
-        domain1.save((err, domain1) => {
+        coordinator1.save((err, coordinator) => {
             if (err) {
                 try {
                     fs.unlinkSync(newPath);
@@ -232,34 +196,34 @@ exports.updateDomain = (req, res) => {
                 }
 
                 res.status(400).json({
-                    error: "updating domain in DB failed!!"
+                    error: "updating coordinator in DB failed!!"
                 });
             }
             res.json({
-                message: "domain updated successfully",
-                domain1
+                message: "coordinator updated successfully",
+                coordinator
             })
         });
     });
 }
 
-exports.deleteDomain = (req, res) => {
-    let domain1 = req.domain1;
-    domain1.remove((err, deletedDomain) => {
+exports.deleteCoordinator = (req, res) => {
+    let coordinator1 = req.coordinator1;
+    coordinator1.remove((err, deletedCoordinator) => {
         if (err) {
             return res.status(400).json(
-                failAction(" Domain not found")
+                failAction(" Coordinator not found")
             )
         }
 
         try {
-            fs.unlinkSync(deletedDomain.photo);
+            fs.unlinkSync(deletedCoordinator.photo);
         } catch (err) {
             console.log("file not found")
         }
         res.json({
             message: "Deleted Successfully",
-            deletedDomain
+            deletedCoordinator
         })
     })
 }
