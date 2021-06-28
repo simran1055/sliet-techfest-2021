@@ -1,9 +1,9 @@
-import Domain from '../models/domain'
-import { successAction, failAction } from '../utills/response'
+const Domain = require('../models/domain');
+const { successAction, failAction } = require("../utills/response")
 const formidable = require("formidable");
-import fs from "fs"
-import path from "path"
-import _ from "lodash";
+const fs = require("fs")
+const path = require("path")
+const _ = require("lodash");
 
 exports.getDomainById = (req, res, next, id) => {
     Domain.findById(id).populate('studentCoordinator').populate('facultyCoordinator').exec((err, domain1) => {

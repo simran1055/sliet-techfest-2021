@@ -1,15 +1,15 @@
 // Import Modules
-import 'dotenv/config';
-import express from 'express';
+require('dotenv').config();
+const express = require('express');;
 
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 // Import Files
-import './db/index';
-import authRoutes from './routes/auth'
-import userRoutes from './routes/user'
-import domainRoutes from './routes/domain'
-import coordinatorRoutes from './routes/coordinator'
+require('./db/index');
+const authRoutes = require('./routes/auth')
+const userRoutes = require('./routes/user')
+const domainRoutes = require('./routes/domain')
+const coordinatorRoutes = require('./routes/coordinator')
 
 // Constatns 
 const PORT = process.env.PORT || 4000; //Server Port

@@ -2,9 +2,9 @@
   "name": "sliet",
   "version": "1.0.0",
   "description": "Sliet Fest 2021",
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {
-    "start": "nodemon --exec babel-node app.js"
+    "start": "nodemon app.js"
   },
   "author": "",
   "license": "ISC",

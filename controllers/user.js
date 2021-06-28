@@ -1,9 +1,9 @@
-import User from "../models/user"
-import Subscribers from '../models/subscribers'
-import message from '../utills/messages'
-import { mailFn } from '../utills/mail';
-import { validationResult } from "express-validator";
-import { successAction, failAction } from "../utills/response"
+const User = require("../models/user");
+const Subscribers = require('../models/subscribers')
+const message = require('../utills/messages')
+const { mailFn }= require('../utills/mail')
+const { validationResult }= require('express-validator')
+const { successAction, failAction  }= require('../utills/response')
 
 exports.getUserById = (req, res, next, id) => {
     User.findById(id).exec((err, user) => {

@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+const mongoose = require('mongoose');
 
 const coordinatorchema = new mongoose.Schema({
 
@@ -38,4 +38,4 @@ const coordinatorchema = new mongoose.Schema({
 })
 
 
-export default mongoose.model("Coordinator", coordinatorchema)
+module.exports = mongoose.model("Coordinator", coordinatorchema)

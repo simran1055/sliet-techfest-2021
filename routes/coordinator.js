@@ -1,9 +1,8 @@
-import express from "express";
+const express = require('express')
 var router = express.Router()
-import { check } from "express-validator"
-import { getUserById, getUser, updateUser, notify } from "../controllers/user"
-import { isAuthenticated, isSignedIn, isSuperAdmin } from "../controllers/auth"
-import { getCoordinatorById, getCoordinator, createCoordinator, deleteCoordinator, updateCoordinator, getAllCoordinators, photo } from "../controllers/coordinator"
+const { getUserById, getUser, updateUser, notify } = require("../controllers/user")
+const { isAuthenticated, isSignedIn, isSuperAdmin } = require("../controllers/auth")
+const { getCoordinatorById, getCoordinator, createCoordinator, deleteCoordinator, updateCoordinator, getAllCoordinators, photo } = require("../controllers/coordinator")
 
 
 router.param('userId', getUserById);
@@ -33,4 +32,4 @@ router.delete(
 );
 
 router.get("/coordinator/photo/:coordinatorId", photo);
-export default router;
+module.exports = router;

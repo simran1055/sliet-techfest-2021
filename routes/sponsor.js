@@ -1,8 +1,9 @@
-import express from 'express';
+const express = require('express');;
 var router = express.Router();
 import { check } from "express-validator"
 import { sponsorsList, addSponsor, profileUpdate, adminSponsorList } from "../controllers/sponsor"
-import { isAuthenticated, isSignedIn, isAdmin } from "../controllers/auth"
+const { isAuthenticated, isSignedIn, isAdmin } = require("../controllers/auth")
+
 
 // Add Sponsors 
 router.post('/add-sponsors',
@@ -22,4 +23,4 @@ router.get('/admin-sponsors-list', isSignedIn, isAdmin, isAuthenticated, adminSp
 // Profile Update
 router.post('/sponsors-profile-update', isSignedIn, isAdmin, isAuthenticated, profileUpdate)
 
-export default router;
+module.exports = router;

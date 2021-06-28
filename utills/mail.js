@@ -1,5 +1,5 @@
 
-import nodemailer from'nodemailer';
+const nodemailer = require('nodemailer');
 //const constantObj = require('../config/env');
 
 const transporter = nodemailer.createTransport(
@@ -13,11 +13,11 @@ const transporter = nodemailer.createTransport(
         }
     });
 
-export const mailFn = async (mailOptions) => {
+exports.mailFn = async (mailOptions) => {
     if (mailOptions.to == 'beawaredotworld@gmail.com') {
 
     } else {
-        transporter.sendMail({...mailOptions,from:'beawaredotworld@gmail.com'}, function (error, info) {
+        transporter.sendMail({ ...mailOptions, from: 'beawaredotworld@gmail.com' }, function (error, info) {
             if (error) {
                 console.log('Error on email', error);
             } else {

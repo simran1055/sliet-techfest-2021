@@ -1,9 +1,9 @@
 import Sponsors from "../models/sponsors"
-import message from '../utills/messages'
-import { mailFn } from '../utills/mail';
-import { validationResult } from "express-validator";
-import { successAction, failAction } from "../utills/response"
-import { v4 as uuidv4 } from 'uuid';
+const message = require('../utills/messages')
+const { mailFn }= require('../utills/mail')
+const { validationResult }= require('express-validator')
+const { successAction, failAction  }= require('../utills/response')
+const { uuidv4 } = require('uuid');
 
 // Add Sponsor
 export const addSponsor = async (req, res) => {
