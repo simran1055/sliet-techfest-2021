@@ -108,4 +108,6 @@ uploads/*.jpeg
 uploads/*.jpg
 uploads/*.png
 
+db
+
 dist
