@@ -73,8 +73,6 @@ exports.signUp = async (req, res) => {
             })
         )
     })
-
-
 }
 
 
@@ -222,6 +220,14 @@ exports.isAdmin = (req, res, next) => {
     if (req.profile.role == 0) {
         res.status(403).json({
             error: "You are not admin, ACCESS DENIED"
+        })
+    }
+    next();
+}
+exports.isSuperAdmin = (req, res, next) => {
+    if (req.profile.role == 0 || req.profile.role == 1) {
+        res.status(403).json({
+            error: "You are not super admin, ACCESS DENIED"
         })
     }
     next();

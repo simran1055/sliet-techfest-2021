@@ -11,6 +11,11 @@ const SponsorSchema = new mongoose.Schema({
         type: String,
         required: true,
         trim: true,
+    }, 
+    orgNumber: {
+        type: String,
+        required: true,
+        trim: true,
     },
     socialMedia: [
         {
@@ -18,7 +23,7 @@ const SponsorSchema = new mongoose.Schema({
                 type: String,
                 trim: true
             },
-            linkedIn : {
+            linkedIn: {
                 type: String,
                 trim: true
             },
@@ -32,15 +37,15 @@ const SponsorSchema = new mongoose.Schema({
             }
         }
     ],
-    website:{
+    website: {
         type: String,
         trim: true,
     },
-    description:{
+    description: {
         type: String,
         trim: true,
     },
-    orgLogo:{
+    orgLogo: {
         type: String,
         trim: true,
     },

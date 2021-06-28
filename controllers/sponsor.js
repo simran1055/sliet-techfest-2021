@@ -50,9 +50,21 @@ export const addSponsor = async (req, res) => {
     })
 }
 
-// All Sponsor List
+//Sponsor List FrontEnd
 export const sponsorsList = async (req, res) => {
-    Sponsors.find({}, { isVerifiedByAdmin: ture }, (err, sponsor) => {
+    Sponsors.find({ isVerifiedByAdmin: 'true' }, (err, sponsor) => {
+        if (err) {
+            return res.status(400).json(
+                failAction("Something happend, try again later.")
+            )
+        }
+        res.send(successAction(sponsor))
+    })
+}
+
+// All sponsor list
+export const adminSponsorList = async (req, res) => {
+    Sponsors.find({}, (err, sponsor) => {
         if (err) {
             return res.status(400).json(
                 failAction("Something happend, try again later.")
@@ -64,10 +76,6 @@ export const sponsorsList = async (req, res) => {
 
 // update profile
 export const profileUpdate = async (req, res) => {
-    // let sponsor = await Sponsors.findOne({ _id: req.body._id })
-    // if (!sponsor) {
-    //     return res.status(400).json(failAction('sponsor is not regstered'));
-    // }
     Sponsors.findByIdAndUpdate(
         { _id: req.body._id },
         {
