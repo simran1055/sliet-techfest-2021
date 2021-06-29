@@ -3,10 +3,10 @@ const message = require('../utills/messages')
 const { mailFn }= require('../utills/mail')
 const { validationResult }= require('express-validator')
 const { successAction, failAction  }= require('../utills/response')
-const { uuidv4 } = require('uuid');
+const uuidv4  = require('uuid');
 
 // Add Sponsor
-export const addSponsor = async (req, res) => {
+exports.addSponsor = async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(422).json(failAction(errors.array()[0].msg))
@@ -19,7 +19,7 @@ export const addSponsor = async (req, res) => {
     }
     let payload = {
         ...req.body, ...{
-            verificationCode: uuidv4()
+            verificationCode: uuidv4.v4()
         }
     }
 
@@ -51,7 +51,7 @@ export const addSponsor = async (req, res) => {
 }
 
 //Sponsor List FrontEnd
-export const sponsorsList = async (req, res) => {
+exports.sponsorsList = async (req, res) => {
     Sponsors.find({ isVerifiedByAdmin: 'true' }, (err, sponsor) => {
         if (err) {
             return res.status(400).json(
@@ -63,7 +63,7 @@ export const sponsorsList = async (req, res) => {
 }
 
 // All sponsor list
-export const adminSponsorList = async (req, res) => {
+exports.adminSponsorList = async (req, res) => {
     Sponsors.find({}, (err, sponsor) => {
         if (err) {
             return res.status(400).json(
@@ -75,7 +75,7 @@ export const adminSponsorList = async (req, res) => {
 }
 
 // update profile
-export const profileUpdate = async (req, res) => {
+exports.profileUpdate = async (req, res) => {
     Sponsors.findByIdAndUpdate(
         { _id: req.body._id },
         {

@@ -1,6 +1,6 @@
 
 
 
-export const createEvent = (req, res) => {
+exports.createEvent = (req, res) => {
 
 }

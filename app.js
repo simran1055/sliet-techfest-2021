@@ -10,6 +10,8 @@ const authRoutes = require('./routes/auth')
 const userRoutes = require('./routes/user')
 const domainRoutes = require('./routes/domain')
 const coordinatorRoutes = require('./routes/coordinator')
+const sponsorRoutes = require('./routes/sponsor')
+const eventsRoutes = require('./routes/event')
 
 // Constatns 
 const PORT = process.env.PORT || 4000; //Server Port
@@ -25,8 +27,10 @@ app.use("/api", authRoutes);
 app.use('/api', userRoutes);
 app.use('/api', domainRoutes);
 app.use('/api', coordinatorRoutes);
+app.use('/api', eventsRoutes);
+app.use('/api', sponsorRoutes);
 app.use('//', (req, res) => {
-    res.send('Welcome')
+    res.send('Welcome :)')
 });
 
 // Server Connection

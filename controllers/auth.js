@@ -1,5 +1,5 @@
 const { check, cookie, validationResult } = require("express-validator");
-const { uuidv4 } = require('uuid');
+const uuidv4  = require('uuid');
 
 const User = require("../models/user");
 const { mailFn } = require("../utills/mail");
@@ -33,7 +33,7 @@ exports.signUp = async (req, res) => {
 
         payload = {
             ...req.body, ...{
-                verificationCode: uuidv4(),
+                verificationCode: uuidv4.v4(),
                 collegeName,
                 regNo
             }
@@ -42,7 +42,7 @@ exports.signUp = async (req, res) => {
 
         payload = {
             ...req.body, ...{
-                verificationCode: uuidv4()
+                verificationCode: uuidv4.v4()
             }
         }
     }

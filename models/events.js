@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const SponsorSchema = new mongoose.Schema({
+const EventrSchema = new mongoose.Schema({
     eventName: {
         type: String,
         require: true,
@@ -51,3 +51,5 @@ const SponsorSchema = new mongoose.Schema({
             }
         }],
 })
+
+module.exports = mongoose.model('Events', EventrSchema)
