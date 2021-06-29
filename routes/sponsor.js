@@ -1,7 +1,7 @@
 const express = require('express');;
 var router = express.Router();
-import { check } from "express-validator"
-import { sponsorsList, addSponsor, profileUpdate, adminSponsorList } from "../controllers/sponsor"
+const { check } = require("express-validator")
+const { sponsorsList, addSponsor, profileUpdate, adminSponsorList }  = require("../controllers/sponsor")
 const { isAuthenticated, isSignedIn, isAdmin } = require("../controllers/auth")
 
 

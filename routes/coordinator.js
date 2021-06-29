@@ -1,9 +1,9 @@
 const express = require('express')
-var router = express.Router()
 const { getUserById, getUser, updateUser, notify } = require("../controllers/user")
 const { isAuthenticated, isSignedIn, isSuperAdmin } = require("../controllers/auth")
 const { getCoordinatorById, getCoordinator, createCoordinator, deleteCoordinator, updateCoordinator, getAllCoordinators, photo } = require("../controllers/coordinator")
 
+var router = express.Router()
 
 router.param('userId', getUserById);
 router.param('coordinatorId', getCoordinatorById);

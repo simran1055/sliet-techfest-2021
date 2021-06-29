@@ -1,6 +1,6 @@
 const express = require('express');;
-import { createEvent } from '../controllers/event'
-import { isAuthenticated, isSignedIn, isAdmin, isSuperAdmin } from "../controllers/auth"
+const { createEvent } = require('../controllers/event')
+const { isAuthenticated, isSignedIn, isAdmin, isSuperAdmin } = require("../controllers/auth")
 
 const router = express.Router();
 
