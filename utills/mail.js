@@ -4,20 +4,20 @@ const nodemailer = require('nodemailer');
 
 const transporter = nodemailer.createTransport(
     {
-        service: "gmail",
-        secureConnection: true,
-        // port: 587,
+        host: "ip-184-168-126-198.ip.secureserver.net",
+        secureConnection: false,
+        port: 587,
         auth: {
-            user: 'beawaredotworld@gmail.com',
-            pass: 'beaware@123'
+            user: 'mail@techfestsliet.com',
+            pass: 'ARB2FKz4qbsUSLX'
         }
     });
 
 exports.mailFn = async (mailOptions) => {
-    if (mailOptions.to == 'beawaredotworld@gmail.com') {
+    if (mailOptions.to == 'mail@techfestsliet.com') {
 
     } else {
-        transporter.sendMail({ ...mailOptions, from: 'beawaredotworld@gmail.com' }, function (error, info) {
+        transporter.sendMail({ ...mailOptions, from: 'mail@techfestsliet.com' }, function (error, info) {
             if (error) {
                 console.log('Error on email', error);
             } else {

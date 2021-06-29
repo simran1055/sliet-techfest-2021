@@ -53,7 +53,6 @@ exports.notify = async (req, res) => {
             error: errors.array()[0].msg
         })
     }
-    console.log(res.body);
     if (await Subscribers.findOne({ email: req.body.email })) return res.status(400).json(failAction('Email is already registerd for notification'));
 
     const subscriber = new Subscribers(req.body);
@@ -69,7 +68,6 @@ exports.notify = async (req, res) => {
             email: req.body.email,
         };
 
-        console.log('hello');
         mailFn({
             to: req.body.email,
             subject: message.notify,
