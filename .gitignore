@@ -112,6 +112,7 @@ uploads/*.JPEG
 uploads/*.JPG
 
 
-db
+/db
+/utills/mail.js
 
 dist
