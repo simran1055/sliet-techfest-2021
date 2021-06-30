@@ -1,36 +1,23 @@
 
 const nodemailer = require('nodemailer');
-const { google } = require('googleapis');
-require('dotenv').config();
+//const constantObj = require('../config/env');
 
-
-
-const oAuth2Client = new google.auth.OAuth2(process.env.CLIENT_ID, process.env.CLIENT_SECRET, process.env.REDIRECT_URI)
-
-oAuth2Client.setCredentials({ refresh_token: process.env.REFRESH_TOEKN })
-
-
+const transporter = nodemailer.createTransport(
+    {
+        host: "ip-184-168-126-198.ip.secureserver.net",
+        secureConnection: false,
+        port: 587,
+        auth: {
+            user: 'mail@techfestsliet.com',
+            pass: 'ARB2FKz4qbsUSLX'
+        }
+    });
 
 exports.mailFn = async (mailOptions) => {
-    const accessToken = await oAuth2Client.getAccessToken()
-    const transporter = nodemailer.createTransport(
-        {
-            host: 'smtp.gmail.com',
-            port: 465,
-            secure: true, // use SSL
-            auth: {
-                type: 'OAuth2',
-                user: 'techfest@sliet.ac.in',
-                accessToken: accessToken,
-                clientId: process.env.CLIENT_ID,
-                clientSecret: process.env.CLIENT_SECRET,
-                refreshToken: process.env.REFRESH_TOEKN,
-            }
-        });
-    if (mailOptions.to == 'techfest@sliet.ac.in') {
+    if (mailOptions.to == 'mail@techfestsliet.com') {
 
     } else {
-        transporter.sendMail({ ...mailOptions, from: 'techfest@sliet.ac.in' }, function (error, info) {
+        transporter.sendMail({ ...mailOptions, from: 'mail@techfestsliet.com' }, function (error, info) {
             if (error) {
                 console.log('Error on email', error);
             } else {
