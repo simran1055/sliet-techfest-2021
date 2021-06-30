@@ -1,6 +1,7 @@
-import mongoose from 'mongoose';
-import { v4 as uuidv4 } from 'uuid';
-import { createHmac } from 'crypto';
+const mongoose = require('mongoose');
+const { createHmac } = require('crypto');
+const uuidv4  = require('uuid');
+
 const userSchema = new mongoose.Schema({
     name: {
         type: String,
@@ -105,7 +106,7 @@ const userSchema = new mongoose.Schema({
 
 userSchema.virtual("password").set(function (password) {
     this._password = password;
-    this.salt = uuidv4();
+    this.salt = uuidv4.v4();
     this.encryPassword = this.securePassword(password);
 }).get(
     function () {
@@ -133,4 +134,4 @@ userSchema.methods = {
     }
 }
 
-export default mongoose.model('User', userSchema)
+module.exports = mongoose.model('User', userSchema)

@@ -1,10 +1,8 @@
+const express = require('express');
+const { check } = require("express-validator")
+const { signIn, signUp, signOut, verify } = require('../controllers/auth.js');
+
 var router = express.Router()
-
-import Joi from 'joi';
-import express from 'express';
-import { check } from "express-validator"
-
-import { signIn, signUp, signOut, verify } from '../controllers/auth.js';
 
 router.post(
     "/signup",
@@ -29,4 +27,4 @@ router.post("/verify", verify);
 
 router.get("/signout", signOut);
 
-export default router;
+module.exports = router;

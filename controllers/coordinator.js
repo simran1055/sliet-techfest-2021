@@ -1,9 +1,9 @@
-import Coordinator from '../models/coordinator'
-import { successAction, failAction } from '../utills/response'
+const Coordinator = require('../models/coordinator')
+const { successAction, failAction } = require("../utills/response")
 const formidable = require("formidable");
-import fs from "fs"
-import path from "path"
-import _ from "lodash";
+const fs = require("fs")
+const path = require("path")
+const _ = require("lodash");
 
 exports.getCoordinatorById = (req, res, next, id) => {
     Coordinator.findById(id).exec((err, coordinator1) => {
@@ -58,8 +58,8 @@ exports.createCoordinator = (req, res) => {
 
 
             var oldPath = file.photo.path;
-            var newPath = path.join(__dirname, '../uploads')
-                + '/' + Date.now() + '.' + file.photo.name.split('.').pop();
+            var newPath1 = Date.now() + '.' + file.photo.name.split('.').pop();
+            var newPath = 'uploads/' + newPath1
             var rawData = fs.readFileSync(oldPath)
 
             fs.writeFile(newPath, rawData, function (err) {
@@ -79,7 +79,7 @@ exports.createCoordinator = (req, res) => {
 
 
         }
-        coordinator1.photo = newPath;
+        coordinator1.photo = newPath1;
         coordinator1.save((err, coordinator1) => {
             if (err) {
 
@@ -166,8 +166,7 @@ exports.updateCoordinator = (req, res) => {
 
 
             var oldPath = file.photo.path;
-            var newPath = path.join(__dirname, '../uploads')
-                + '/' + Date.now() + '.' + file.photo.name.split('.').pop();
+            var newPath = '/uploads/' + Date.now() + '.' + file.photo.name.split('.').pop();
             var rawData = fs.readFileSync(oldPath)
 
             fs.writeFile(newPath, rawData, function (err) {

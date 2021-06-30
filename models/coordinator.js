@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+const mongoose = require('mongoose');
 
 const coordinatorchema = new mongoose.Schema({
 
@@ -32,10 +32,10 @@ const coordinatorchema = new mongoose.Schema({
         // data: Buffer,
         // contentType: String
         type: String,
-        required: true,
+
         trim: true,
     }
 })
 
 
-export default mongoose.model("Coordinator", coordinatorchema)
+module.exports = mongoose.model("Coordinator", coordinatorchema)

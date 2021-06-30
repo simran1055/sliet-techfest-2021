@@ -1,9 +1,9 @@
-import User from "../models/user"
-import Subscribers from '../models/subscribers'
-import message from '../utills/messages'
-import { mailFn } from '../utills/mail';
-import { validationResult } from "express-validator";
-import { successAction, failAction } from "../utills/response"
+const User = require("../models/user");
+const Subscribers = require('../models/subscribers')
+const message = require('../utills/messages')
+const { mailFn }= require('../utills/mail')
+const { validationResult }= require('express-validator')
+const { successAction, failAction  }= require('../utills/response')
 
 exports.getUserById = (req, res, next, id) => {
     User.findById(id).exec((err, user) => {
@@ -53,7 +53,6 @@ exports.notify = async (req, res) => {
             error: errors.array()[0].msg
         })
     }
-    console.log(res.body);
     if (await Subscribers.findOne({ email: req.body.email })) return res.status(400).json(failAction('Email is already registerd for notification'));
 
     const subscriber = new Subscribers(req.body);
@@ -69,7 +68,6 @@ exports.notify = async (req, res) => {
             email: req.body.email,
         };
 
-        console.log('hello');
         mailFn({
             to: req.body.email,
             subject: message.notify,
