@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+const mongoose = require('mongoose');
 
 const SponsorSchema = new mongoose.Schema({
     orgName: {
@@ -11,7 +11,7 @@ const SponsorSchema = new mongoose.Schema({
         type: String,
         required: true,
         trim: true,
-    }, 
+    },
     orgNumber: {
         type: String,
         required: true,
@@ -59,4 +59,4 @@ const SponsorSchema = new mongoose.Schema({
     },
 })
 
-export default mongoose.model('Sponsors', SponsorSchema)
+module.exports = mongoose.model('Sponsors', SponsorSchema)

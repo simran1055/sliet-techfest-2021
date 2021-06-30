@@ -1,9 +1,9 @@
-import Coordinator from '../models/coordinator'
-import { successAction, failAction } from '../utills/response'
+const Coordinator = require('../models/coordinator')
+const { successAction, failAction } = require("../utills/response")
 const formidable = require("formidable");
-import fs from "fs"
-import path from "path"
-import _ from "lodash";
+const fs = require("fs")
+const path = require("path")
+const _ = require("lodash");
 
 exports.getCoordinatorById = (req, res, next, id) => {
     Coordinator.findById(id).exec((err, coordinator1) => {

@@ -1,10 +1,10 @@
-import { check, cookie, validationResult } from "express-validator";
-import { v4 as uuidv4 } from 'uuid';
+const { check, cookie, validationResult } = require("express-validator");
+const uuidv4  = require('uuid');
 
-import User from "../models/user";
-import { mailFn } from '../utills/mail';
-import { successAction, failAction } from "../utills/response"
-import message from '../utills/messages'
+const User = require("../models/user");
+const { mailFn } = require("../utills/mail");
+const { successAction, failAction } = require("../utills/response")
+const message = require("../utills/messages")
 
 var jwt = require('jsonwebtoken');
 var expressJwt = require('express-jwt');
@@ -33,7 +33,7 @@ exports.signUp = async (req, res) => {
 
         payload = {
             ...req.body, ...{
-                verificationCode: uuidv4(),
+                verificationCode: uuidv4.v4(),
                 collegeName,
                 regNo
             }
@@ -42,7 +42,7 @@ exports.signUp = async (req, res) => {
 
         payload = {
             ...req.body, ...{
-                verificationCode: uuidv4()
+                verificationCode: uuidv4.v4()
             }
         }
     }
