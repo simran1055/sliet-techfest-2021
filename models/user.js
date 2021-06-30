@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const { createHmac } = require('crypto');
-const uuidv4  = require('uuid');
+const uuidv4 = require('uuid');
 
 const userSchema = new mongoose.Schema({
     name: {
@@ -95,6 +95,9 @@ const userSchema = new mongoose.Schema({
     isProfileComplete: {
         type: Boolean,
         default: 0
+    },
+    userId: {
+        type: String
     }
 
 });
