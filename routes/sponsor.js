@@ -1,9 +1,8 @@
 const express = require('express');;
 var router = express.Router();
 const { check } = require("express-validator")
-const { sponsorsList, addSponsor, profileUpdate, adminSponsorList }  = require("../controllers/sponsor")
+const { sponsorsList, addSponsor, profileUpdate, adminSponsorList } = require("../controllers/sponsor")
 const { isAuthenticated, isSignedIn, isAdmin } = require("../controllers/auth")
-
 
 // Add Sponsors 
 router.post('/add-sponsors',
