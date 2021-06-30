@@ -30,14 +30,12 @@ app.use("/api", authRoutes);
 app.use('/api', userRoutes);
 app.use('/api', domainRoutes);
 app.use('/api', coordinatorRoutes);
-// app.use('/uploads', express.static(path.join(__dirname, "uploads")));
-app.use('/api', eventsRoutes);
 app.use('/api', sponsorRoutes);
+app.use('/api', eventsRoutes);
+
 app.use('//', (req, res) => {
     res.send('Welcome :)')
 });
-
-
 
 // Server Connection
 app.listen(PORT, () => {

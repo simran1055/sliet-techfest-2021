@@ -18,26 +18,21 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true,
         trim: true,
-        exports.
-
     },
     phone: {
         type: String,
         maxlength: 15,
         trim: true,
-        exports.
     },
     whatsappPhoneNumber: {
         type: String,
         maxlength: 15,
         trim: true,
-        exports.
     },
     telegramPhoneNumber: {
         type: String,
         maxlength: 15,
         trim: true,
-        exports.
     },
     dob: {
         type: Date,
