@@ -22,4 +22,4 @@ router.get('/admin-sponsors-list', isSignedIn, isAdmin, isAuthenticated, adminSp
 // Profile Update
 router.post('/sponsors-profile-update', isSignedIn, isAdmin, isAuthenticated, profileUpdate)
 
-export default router;
+module.exports = router;

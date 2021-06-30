@@ -54,6 +54,8 @@ exports.createDomain = (req, res) => {
             facultyCoordinator: facultyCoordinatorArray,
         });
 
+        console.log("hello  asdjhak  " + file.photo)
+
         if (file.photo) {
             if (file.photo.size > 3000000) {
                 return res.status(400).json({
@@ -68,10 +70,13 @@ exports.createDomain = (req, res) => {
 
 
             var oldPath = file.photo.path;
-            var newPath = path.join(__dirname, '../uploads')
-                + '/' + Date.now() + '.' + file.photo.name.split('.').pop();
-            var rawData = fs.readFileSync(oldPath)
+            // var newPath = path.join(__dirname, '../uploads')
+            //     + '/' + Date.now() + '.' + file.photo.name.split('.').pop();
+            var newPath1 = Date.now() + '.' + file.photo.name.split('.').pop();
+            var newPath = 'uploads/' + newPath1
 
+            var rawData = fs.readFileSync(oldPath)
+            console.log("hello" + oldPath, newPath)
             fs.writeFile(newPath, rawData, function (err) {
                 if (err) {
 
@@ -89,7 +94,7 @@ exports.createDomain = (req, res) => {
 
 
         }
-        domain1.photo = newPath;
+        domain1.photo = newPath1;
         domain1.save((err, domain1) => {
             if (err) {
 
@@ -117,7 +122,7 @@ exports.createDomain = (req, res) => {
 }
 
 exports.getDomain = (req, res) => {
-    req.domain1.photo = undefined;
+    // req.domain1.photo = undefined;
     return res.json(req.domain1)
 }
 

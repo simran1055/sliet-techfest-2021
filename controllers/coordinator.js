@@ -58,8 +58,8 @@ exports.createCoordinator = (req, res) => {
 
 
             var oldPath = file.photo.path;
-            var newPath = path.join(__dirname, '../uploads')
-                + '/' + Date.now() + '.' + file.photo.name.split('.').pop();
+            var newPath1 = Date.now() + '.' + file.photo.name.split('.').pop();
+            var newPath = 'uploads/' + newPath1
             var rawData = fs.readFileSync(oldPath)
 
             fs.writeFile(newPath, rawData, function (err) {
@@ -79,7 +79,7 @@ exports.createCoordinator = (req, res) => {
 
 
         }
-        coordinator1.photo = newPath;
+        coordinator1.photo = newPath1;
         coordinator1.save((err, coordinator1) => {
             if (err) {
 
@@ -166,8 +166,7 @@ exports.updateCoordinator = (req, res) => {
 
 
             var oldPath = file.photo.path;
-            var newPath = path.join(__dirname, '../uploads')
-                + '/' + Date.now() + '.' + file.photo.name.split('.').pop();
+            var newPath = '/uploads/' + Date.now() + '.' + file.photo.name.split('.').pop();
             var rawData = fs.readFileSync(oldPath)
 
             fs.writeFile(newPath, rawData, function (err) {
