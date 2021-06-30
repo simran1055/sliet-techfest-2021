@@ -8,7 +8,6 @@ const cookieParser = require("cookie-parser");
 
 // Import Files
 const path = require("path");
-const sponsorRoutes = require('./routes/sponsor');
 const authRoutes = require('./routes/auth')
 const userRoutes = require('./routes/user')
 const domainRoutes = require('./routes/domain')
