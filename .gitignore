@@ -111,7 +111,6 @@ uploads/*.PNG
 uploads/*.JPEG
 uploads/*.JPG
 
-
 /db
 /utills/mail.js
 

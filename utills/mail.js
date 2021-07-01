@@ -4,12 +4,12 @@ const nodemailer = require('nodemailer');
 
 const transporter = nodemailer.createTransport(
     {
-        host: "ip-184-168-126-198.ip.secureserver.net",
+        host: "smtpout.secureserver.net",
         secureConnection: false,
         port: 587,
         auth: {
             user: 'mail@techfestsliet.com',
-            pass: 'ARB2FKz4qbsUSLX'
+            pass: 'Sliet@20201'
         }
     });
 
