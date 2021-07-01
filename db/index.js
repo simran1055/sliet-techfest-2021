@@ -1,9 +1,7 @@
 const mongoose = require('mongoose');
 const os = require('os');
 
-const databaseUrl =
-    `mongodb://localhost:27017/slietTechFest`;
-;
+const databaseUrl = process.env.MONGODB_URL || `mongodb://localhost:27017/slietTechFest`;
 
 console.log(databaseUrl);
 
