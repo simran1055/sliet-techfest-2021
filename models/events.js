@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { ObjectId } = mongoose.Schema;
 
 const EventrSchema = new mongoose.Schema({
     eventName: {
@@ -7,7 +8,7 @@ const EventrSchema = new mongoose.Schema({
         trim: true
     },
     domainRefId: {
-        type: ObjectId,
+        type: String,
         require: true,
         trim: true
     },
@@ -45,7 +46,7 @@ const EventrSchema = new mongoose.Schema({
                 trim: true
             },
             teamRef: {
-                type: ObjectId,
+                type: String,
                 require: true,
                 trim: true
             }

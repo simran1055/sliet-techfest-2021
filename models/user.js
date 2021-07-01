@@ -98,8 +98,19 @@ const userSchema = new mongoose.Schema({
     },
     userId: {
         type: String
+    },
+    campusAmbassador: {
+        refCode: {
+            type: String
+        },
+        isActive: {
+            type: Number,
+        },
+        // 0 for inactive, 1 for active, 2 for suspended, 3 for delete
+        isVerified: {
+            type: Boolean,
+        }
     }
-
 });
 
 userSchema.virtual("password").set(function (password) {

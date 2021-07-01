@@ -114,7 +114,7 @@ exports.signIn = (req, res) => {
 
 
         // create a token
-        const token = jwt.sign({ _id: user._id }, process.env.SECRET);
+        const token = jwt.sign({ _id: user._id, role: user.role }, process.env.SECRET);
 
         // put token in cookie
         res.cookie("token", token, { expire: new Date() + 9999 });
@@ -205,6 +205,7 @@ exports.isAuthenticated = (req, res, next) => {
 
 
 
+
 ///middle ware for isverified
 // exports.isVerified = (req, res, next) => {
 //     User.findById(req.auth._id).exec((err, user) => {
@@ -250,4 +251,16 @@ function pad(number, length) {
 
     return str;
 
+}
+
+exports.isAuthenticatedFn = (req, res, next) => {
+    console.log(req.auth);
+    if (!req.auth) {
+        res.status(403).json({
+            error: "Access Denied , Not authenticated"
+        })
+    } else {
+        req.user = req.auth;
+    }
+    next()
 }
