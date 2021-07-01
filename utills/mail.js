@@ -4,20 +4,20 @@ const nodemailer = require('nodemailer');
 
 const transporter = nodemailer.createTransport(
     {
-        host: "ip-184-168-126-198.ip.secureserver.net",
+        host: process.env.HOST,
         secureConnection: false,
         port: 587,
         auth: {
-            user: 'mail@techfestsliet.com',
-            pass: 'ARB2FKz4qbsUSLX'
+            user: process.env.EMAIL,
+            pass: process.env.EMAIL_PASSWORD
         }
     });
 
 exports.mailFn = async (mailOptions) => {
-    if (mailOptions.to == 'mail@techfestsliet.com') {
+    if (mailOptions.to == process.env.EMAIL) {
 
     } else {
-        transporter.sendMail({ ...mailOptions, from: 'mail@techfestsliet.com' }, function (error, info) {
+        transporter.sendMail({ ...mailOptions, from: process.env.EMAIL }, function (error, info) {
             if (error) {
                 console.log('Error on email', error);
             } else {

@@ -1,5 +1,5 @@
 const { check, cookie, validationResult } = require("express-validator");
-const uuidv4  = require('uuid');
+const uuidv4 = require('uuid');
 
 const User = require("../models/user");
 const { mailFn } = require("../utills/mail");
@@ -18,15 +18,17 @@ exports.signUp = async (req, res) => {
         })
     }
 
-    // if (await User.findOne({ name: req.body.name })) return res.status(400).json(failAction('Name is already registerd'));
-    if (await User.findOne({ email: req.body.email })) {
-        return res.status(400).json(failAction('Email is already registerd'));
-    }
+    // // if (await User.findOne({ name: req.body.name })) return res.status(400).json(failAction('Name is already registerd'));
+    // if (await User.findOne({ email: req.body.email })) {
+    //     return res.status(400).json(failAction('Email is already registerd'));
+    // }
 
-    var emailAr = req.body.email.split("@");
-    var use = emailAr[0];
-    var domain = emailAr[1];
-    var payload;
+    let count = await User.count();
+    let emailAr = req.body.email.split("@");
+    let use = emailAr[0];
+    let domain = emailAr[1];
+    let userId = '#TF' + pad(count + 1, 5).toString();
+    let payload;
     if (domain == "sliet.ac.in") {
         let collegeName = "Sant Longowal Institute of Engineering and Technology";
         let regNo = use;
@@ -35,13 +37,15 @@ exports.signUp = async (req, res) => {
             ...req.body, ...{
                 verificationCode: uuidv4.v4(),
                 collegeName,
-                regNo
+                userId,
+                regNo,
             }
         }
     } else {
 
         payload = {
             ...req.body, ...{
+                userId,
                 verificationCode: uuidv4.v4()
             }
         }
@@ -233,4 +237,17 @@ exports.isSuperAdmin = (req, res, next) => {
         })
     }
     next();
+}
+
+
+// Pad number 
+function pad(number, length) {
+
+    var str = '' + number;
+    while (str.length < length) {
+        str = '0' + str;
+    }
+
+    return str;
+
 }
