@@ -126,7 +126,8 @@ exports.signIn = (req, res) => {
         res.json(
             successAction({
                 token,
-                user: { _id, email, name, role, isVerified }
+                // user: { _id, email, name, role, isVerified }
+                user
             })
         )
     })

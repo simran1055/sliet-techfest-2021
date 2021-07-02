@@ -98,6 +98,9 @@ const userSchema = new mongoose.Schema({
     },
     userId: {
         type: String
+    },
+    isPaymentDone: {
+        type: Boolean
     }
 
 });
