@@ -42,7 +42,6 @@ exports.updateUser = (req, res) => {
                     error: "You are not authorized to update this user"
                 })
             }
-
             user.salt = undefined;
             user.encryPassword = undefined;
             res.json(user)
@@ -91,17 +90,22 @@ exports.notify = async (req, res) => {
 // User request Campus Ambassador && Admin verify Campus Ambassador
 exports.campusAmbassador = async (req, res) => {
     let payload;
+    let caid;
     if (req.user.role != 2) {
         if (await User.findOne({ _id: req.user._id }, { campusAmbassador: 1, _id: 0 }) != '{}') {
             return res.send(failAction('Already registered'))
         }
+        caid = req.user._id
         payload = { campusAmbassador: { refCode: generateRandom(5), isVerified: false, isActive: 1 } }
     } else {
         delete req.body['refCode'];
+        
+        //  Admin can delete suspend and verify 
         payload = { campusAmbassador: req.body };
+        caid = req.body._id
     }
     User.findOneAndUpdate(
-        { _id: req.user._id },
+        { _id: caid },
         {
             $set: payload
         }, { new: true, useFindAndModify: false },
@@ -114,4 +118,23 @@ exports.campusAmbassador = async (req, res) => {
             res.send(successAction(user))
         }
     )
+}
+
+
+// Campus Ambassador List for Super Admin
+
+exports.campusAmbassadorListAdmin = async (req, res) => {
+    if (req.user.role == 2) {
+        User.find({ "campusAmbassador.isActive": { $lt: 3 } }, { campusAmbassador: 1, name: 1, email: 1, userId: 1, isVerified: 1, isProfileComplete: 1, role: 1 }, (err, user) => {
+            res.send(successAction(user))
+        })
+    } else {
+        res.send(failAction('You are not Super admin'))
+    }
+}
+
+exports.campusAmbassadorList = async (req, res) => {
+    User.find({ "campusAmbassador.isVerified": true }, { campusAmbassador: 1, name: 1, email: 1, userId: 1, isVerified: 1, isProfileComplete: 1, role: 1 }, (err, user) => {
+        res.send(successAction(user))
+    })
 }
