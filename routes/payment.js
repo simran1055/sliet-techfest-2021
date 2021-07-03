@@ -8,11 +8,11 @@ router.param('userId', getUserById);
 
 router.get("/payment/:userId", isSignedIn, isAuthenticated, getPaymentHashId, processPayment);
 
-route.post('/payment/fail', (req, res) => {
+router.post('/payment/fail', (req, res) => {
 
     res.send(req.body);
 })
-route.post('/payment/success', (req, res) => {
+router.post('/payment/success', (req, res) => {
 
     res.send(req.body);
 })
