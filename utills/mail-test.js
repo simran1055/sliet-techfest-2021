@@ -9,8 +9,6 @@ const oAuth2Client = new google.auth.OAuth2(process.env.CLIENT_ID, process.env.C
 
 oAuth2Client.setCredentials({ refresh_token: process.env.REFRESH_TOEKN })
 
-
-
 exports.mailTestFn = async (mailOptions) => {
     const accessToken = await oAuth2Client.getAccessToken()
     const transporter = nodemailer.createTransport(
@@ -20,17 +18,17 @@ exports.mailTestFn = async (mailOptions) => {
             secure: true, // use SSL
             auth: {
                 type: 'OAuth2',
-                user: 'techfest@sliet.ac.in',
+                user: process.env.G_EMAIL,
                 accessToken: accessToken,
                 clientId: process.env.CLIENT_ID,
                 clientSecret: process.env.CLIENT_SECRET,
                 refreshToken: process.env.REFRESH_TOEKN,
             }
         });
-    if (mailOptions.to == 'techfest@sliet.ac.in') {
+    if (mailOptions.to == process.env.G_EMAIL) {
 
     } else {
-        transporter.sendMail({ ...mailOptions, from: 'techfest@sliet.ac.in' }, function (error, info) {
+        transporter.sendMail({ ...mailOptions, from: process.env.G_EMAIL }, function (error, info) {
             if (error) {
                 console.log('Error on email', error);
             } else {
