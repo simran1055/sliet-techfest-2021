@@ -72,17 +72,12 @@ exports.notify = async (req, res) => {
         let context = {
             email: req.body.email,
         };
-
-        mailFn({
-            to: req.body.email,
-            subject: message.notify,
-            html: `Hey there,
-            Thanks for subscribing to techFEST'21 updates. You've been added to the official mailing list of techFEST, SLIET. 
-            You'll be hearing from us soon. Follow our social media handles to know more.
-            
-            Regards,
-            techFEST, SLIET
-            `
+        ejs.renderFile("public/notify.ejs", function (err, data) {
+            mailFn({
+                to: req.body.email,
+                subject: message.notify,
+                html: data
+            })
         })
 
         res.json(successAction(context, 'Successfully'))
