@@ -2,6 +2,7 @@ const User = require("../models/user");
 const Subscribers = require('../models/subscribers');
 const message = require('../utills/messages');
 const { mailFn } = require('../utills/mail');
+const { mailTestFn } = require('../utills/mail-test');
 const { validationResult } = require('express-validator');
 const { successAction, failAction } = require('../utills/response');
 const { generateRandom } = require('../utills/tokens')
@@ -99,7 +100,7 @@ exports.campusAmbassador = async (req, res) => {
         payload = { campusAmbassador: { refCode: generateRandom(5), isVerified: false, isActive: 1 } }
     } else {
         delete req.body['refCode'];
-        
+
         //  Admin can delete suspend and verify 
         payload = { campusAmbassador: req.body };
         caid = req.body._id
@@ -137,4 +138,19 @@ exports.campusAmbassadorList = async (req, res) => {
     User.find({ "campusAmbassador.isVerified": true }, { campusAmbassador: 1, name: 1, email: 1, userId: 1, isVerified: 1, isProfileComplete: 1, role: 1 }, (err, user) => {
         res.send(successAction(user))
     })
+}
+
+exports.testMessage = (req, res) => {
+    mailTestFn({
+        to: req.body.email,
+        subject: message.notify,
+        html: `Hey there,
+        Thanks for subscribing to techFEST'21 updates. You've been added to the official mailing list of techFEST, SLIET. 
+        You'll be hearing from us soon. Follow our social media handles to know more.
+        
+        Regards,
+        techFEST, SLIET
+        `
+    })
+    res.send('Message Sent')
 }
