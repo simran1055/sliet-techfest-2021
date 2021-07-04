@@ -5,7 +5,8 @@ const { mailFn } = require('../utills/mail');
 const { mailTestFn } = require('../utills/mail-test');
 const { validationResult } = require('express-validator');
 const { successAction, failAction } = require('../utills/response');
-const { generateRandom } = require('../utills/tokens')
+const { generateRandom } = require('../utills/tokens');
+var ejs = require("ejs");
 exports.getUserById = (req, res, next, id) => {
     User.findById(id).exec((err, user) => {
         if (err || !user) {
@@ -141,16 +142,12 @@ exports.campusAmbassadorList = async (req, res) => {
 }
 
 exports.testMessage = (req, res) => {
-    mailTestFn({
-        to: req.body.email,
-        subject: message.notify,
-        html: `Hey there,
-        Thanks for subscribing to techFEST'21 updates. You've been added to the official mailing list of techFEST, SLIET. 
-        You'll be hearing from us soon. Follow our social media handles to know more.
-        
-        Regards,
-        techFEST, SLIET
-        `
+    ejs.renderFile("public/notify.ejs", function (err, data) {
+        mailFn({
+            to: req.body.email,
+            subject: message.notify,
+            html: data
+        })
+        res.send('Message Sent')
     })
-    res.send('Message Sent')
 }

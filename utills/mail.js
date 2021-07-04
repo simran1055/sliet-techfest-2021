@@ -9,7 +9,7 @@ const oAuth2Client = new google.auth.OAuth2(process.env.CLIENT_ID, process.env.C
 
 oAuth2Client.setCredentials({ refresh_token: process.env.REFRESH_TOEKN })
 
-exports.mailTestFn = async (mailOptions) => {
+exports.mailFn = async (mailOptions) => {
     const accessToken = await oAuth2Client.getAccessToken()
     const transporter = nodemailer.createTransport(
         {
