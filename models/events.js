@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { ObjectId } = mongoose.Schema;
 
 const EventrSchema = new mongoose.Schema({
     eventName: {
@@ -11,11 +12,19 @@ const EventrSchema = new mongoose.Schema({
         require: true,
         trim: true
     },
-    domainCreatedDate: {
+    eventCreatedDate: {
         type: Date,
         require: true,
         trim: true,
         default: Date.now()
+    },
+    startDate: {
+        type: Date,
+        require: true
+    },
+    EndDate: {
+        type: Date,
+        require: true
     },
     participantCount: {
         type: String,
@@ -27,29 +36,38 @@ const EventrSchema = new mongoose.Schema({
         require: true,
         trim: true
     },
-    evnetLink: {
-        type: String,
+    eventCreatedBy:{
+        type: ObjectId,
         require: true,
         trim: true
     },
-    winningTeams:
-        [{
-            rank: {
-                type: Number,
-                require: true,
-                trim: true
-            },
-            prize: {
-                type: String,
-                require: true,
-                trim: true
-            },
-            teamRef: {
-                type: ObjectId,
-                require: true,
-                trim: true
-            }
-        }],
+    evnetLink: {
+        type: String,
+        // require: true,
+        trim: true
+    },
+    prize: [],
+    winningTeams: [{
+        rank: {
+            type: Number,
+            require: true,
+            trim: true
+        },
+        teamRef: {
+            type: ObjectId,
+            require: true,
+            trim: true
+        }
+    }],
+    isApproved: {
+        type: Boolean,
+        default: false
+    },
+    isActive: {
+        type: Number,
+        default: 1
+    }// 0 for inactive, 1 for active, 2 for suspended, 3 for delete
+
 })
 
 module.exports = mongoose.model('Events', EventrSchema)
