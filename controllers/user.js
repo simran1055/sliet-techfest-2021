@@ -2,9 +2,11 @@ const User = require("../models/user");
 const Subscribers = require('../models/subscribers');
 const message = require('../utills/messages');
 const { mailFn } = require('../utills/mail');
+const { mailTestFn } = require('../utills/mail-test');
 const { validationResult } = require('express-validator');
 const { successAction, failAction } = require('../utills/response');
-const { generateRandom } = require('../utills/tokens')
+const { generateRandom } = require('../utills/tokens');
+var ejs = require("ejs");
 exports.getUserById = (req, res, next, id) => {
     User.findById(id).exec((err, user) => {
         if (err || !user) {
@@ -70,17 +72,12 @@ exports.notify = async (req, res) => {
         let context = {
             email: req.body.email,
         };
-
-        mailFn({
-            to: req.body.email,
-            subject: message.notify,
-            html: `Hey there,
-            Thanks for subscribing to techFEST'21 updates. You've been added to the official mailing list of techFEST, SLIET. 
-            You'll be hearing from us soon. Follow our social media handles to know more.
-            
-            Regards,
-            techFEST, SLIET
-            `
+        ejs.renderFile("public/notify.ejs", function (err, data) {
+            mailFn({
+                to: req.body.email,
+                subject: message.notify,
+                html: data
+            })
         })
 
         res.json(successAction(context, 'Successfully'))
@@ -136,5 +133,16 @@ exports.campusAmbassadorListAdmin = async (req, res) => {
 exports.campusAmbassadorList = async (req, res) => {
     User.find({ "campusAmbassador.isVerified": true }, { campusAmbassador: 1, name: 1, email: 1, userId: 1, isVerified: 1, isProfileComplete: 1, role: 1 }, (err, user) => {
         res.send(successAction(user))
+    })
+}
+
+exports.testMessage = (req, res) => {
+    ejs.renderFile("public/notify.ejs", function (err, data) {
+        mailFn({
+            to: req.body.email,
+            subject: message.notify,
+            html: data
+        })
+        res.send('Message Sent')
     })
 }

@@ -4,7 +4,8 @@
   "description": "Sliet Fest 2021",
   "main": "app.js",
   "scripts": {
-    "start": "nodemon app.js"
+    "start": "nodemon app.js",
+    "serve": "NODE_ENV=production pm2 start app.js --name=app"
   },
   "author": "",
   "license": "ISC",

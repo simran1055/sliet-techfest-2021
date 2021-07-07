@@ -20,7 +20,10 @@ const paymentRoutes = require('./routes/payment')
 const PORT = process.env.PORT || 4000; //Server Port
 const app = express();
 
+app.set('views', './public');
+app.set('view engine', 'ejs');
 app.use(express.static(path.join(__dirname, "uploads")));
+app.use(express.static(path.join(__dirname, "public")));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json())
 app.use(cookieParser());
@@ -36,7 +39,6 @@ app.use('/api', coordinatorRoutes);
 app.use('/api', sponsorRoutes);
 app.use('/api', eventsRoutes);
 app.use('/api', paymentRoutes);
-
 app.use('//', (req, res) => {
     res.send('Welcome :)')
 });
@@ -45,3 +47,4 @@ app.use('//', (req, res) => {
 app.listen(PORT, () => {
     console.log(`Server is running at Port ${PORT}`);
 })
+
