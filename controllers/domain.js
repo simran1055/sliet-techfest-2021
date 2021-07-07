@@ -4,6 +4,7 @@ const formidable = require("formidable");
 const fs = require("fs")
 const path = require("path")
 const _ = require("lodash");
+const { uploadFileFunc } = require("../utills/fileupload.js")
 
 exports.getDomainById = (req, res, next, id) => {
     Domain.findById(id).populate('studentCoordinator').populate('facultyCoordinator').exec((err, domain1) => {
@@ -54,43 +55,25 @@ exports.createDomain = (req, res) => {
             facultyCoordinator: facultyCoordinatorArray,
         });
 
-        console.log("hello  asdjhak  " + file.photo)
 
         if (file.photo) {
-            if (file.photo.size > 3000000) {
-                return res.status(400).json({
-                    error: "File size too big!"
-                })
-            }
+
 
 
 
             ///TODO: check file type
 
 
+            var fur = uploadFileFunc(file);
 
-            var oldPath = file.photo.path;
-            // var newPath = path.join(__dirname, '../uploads')
-            //     + '/' + Date.now() + '.' + file.photo.name.split('.').pop();
-            var newPath1 = Date.now() + '.' + file.photo.name.split('.').pop();
-            var newPath = 'uploads/' + newPath1
+            if (fur.error) {
+                return res.status(400).json({
+                    error: fur.error
+                })
+            }
 
-            var rawData = fs.readFileSync(oldPath)
-            console.log("hello" + oldPath, newPath)
-            fs.writeFile(newPath, rawData, function (err) {
-                if (err) {
-
-                    return res.status(400).json({
-                        error: err
-                    })
-                }
-
-            })
-
-
-
-
-
+            var newPath1 = fur;
+            var newPath = 'upload/' + newPath1
 
 
         }
@@ -198,31 +181,22 @@ exports.updateDomain = (req, res) => {
             } catch (err) {
                 console.log("file not found")
             }
-            if (file.photo.size > 3000000) {
+
+
+
+            var fur = uploadFileFunc(file);
+
+            if (fur.error) {
                 return res.status(400).json({
-                    error: "File size too big!"
-                });
+                    error: fur.error
+                })
             }
 
+            var newPath1 = fur;
+            var newPath = 'upload/' + newPath1
 
 
-            var oldPath = file.photo.path;
-            var newPath = path.join(__dirname, '../uploads')
-                + '/' + Date.now() + '.' + file.photo.name.split('.').pop();
-            var rawData = fs.readFileSync(oldPath)
-
-            fs.writeFile(newPath, rawData, function (err) {
-                if (err) {
-
-                    return res.status(400).json({
-                        error: err
-                    })
-                }
-
-            })
-
-
-            domain1.photo = newPath;
+            domain1.photo = newPath1;
 
         }
 

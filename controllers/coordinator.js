@@ -4,6 +4,7 @@ const formidable = require("formidable");
 const fs = require("fs")
 const path = require("path")
 const _ = require("lodash");
+const { uploadFileFunc } = require("../utills/fileupload.js")
 
 exports.getCoordinatorById = (req, res, next, id) => {
     Coordinator.findById(id).exec((err, coordinator1) => {
@@ -45,11 +46,6 @@ exports.createCoordinator = (req, res) => {
         let coordinator1 = new Coordinator(fields);
 
         if (file.photo) {
-            if (file.photo.size > 3000000) {
-                return res.status(400).json({
-                    error: "File size too big!"
-                })
-            }
 
 
 
@@ -57,26 +53,16 @@ exports.createCoordinator = (req, res) => {
 
 
 
-            var oldPath = file.photo.path;
-            var newPath1 = Date.now() + '.' + file.photo.name.split('.').pop();
-            var newPath = 'uploads/' + newPath1
-            var rawData = fs.readFileSync(oldPath)
+            var fur = uploadFileFunc(file);
 
-            fs.writeFile(newPath, rawData, function (err) {
-                if (err) {
+            if (fur.error) {
+                return res.status(400).json({
+                    error: fur.error
+                })
+            }
 
-                    return res.status(400).json({
-                        error: err
-                    })
-                }
-
-            })
-
-
-
-
-
-
+            var newPath1 = fur;
+            var newPath = 'upload/' + newPath1
 
         }
         coordinator1.photo = newPath1;
@@ -84,7 +70,7 @@ exports.createCoordinator = (req, res) => {
             if (err) {
 
                 try {
-                    fs.unlinkSync(newPath);
+                    fs.unlinkSync();
                 } catch (err) {
                     console.log("file not found")
                 }
@@ -157,30 +143,22 @@ exports.updateCoordinator = (req, res) => {
             } catch (err) {
                 console.log("file not found")
             }
-            if (file.photo.size > 3000000) {
+
+
+
+
+            var fur = uploadFileFunc(file);
+
+            if (fur.error) {
                 return res.status(400).json({
-                    error: "File size too big!"
-                });
+                    error: fur.error
+                })
             }
 
+            var newPath1 = fur;
+            var newPath = 'upload/' + newPath1
 
-
-            var oldPath = file.photo.path;
-            var newPath = '/uploads/' + Date.now() + '.' + file.photo.name.split('.').pop();
-            var rawData = fs.readFileSync(oldPath)
-
-            fs.writeFile(newPath, rawData, function (err) {
-                if (err) {
-
-                    return res.status(400).json({
-                        error: err
-                    })
-                }
-
-            })
-
-
-            coordinator1.photo = newPath;
+            coordinator1.photo = newPath1;
 
         }
 

@@ -32,6 +32,7 @@ exports.signUp = async (req, res) => {
     if (domain == "sliet.ac.in") {
         let collegeName = "Sant Longowal Institute of Engineering and Technology";
         let regNo = use;
+        let hasPaidEntry = true;
 
         payload = {
             ...req.body, ...{
@@ -39,6 +40,7 @@ exports.signUp = async (req, res) => {
                 collegeName,
                 userId,
                 regNo,
+                hasPaidEntry
             }
         }
     } else {
@@ -73,7 +75,8 @@ exports.signUp = async (req, res) => {
             successAction({
                 name: user.name,
                 email: user.email,
-                id: user._id
+                id: user._id,
+                hasPaidEntry: user.hasPaidEntry
             })
         )
     })
@@ -121,12 +124,13 @@ exports.signIn = (req, res) => {
 
         //send response to frontend
 
-        const { _id, email, name, role, isVerified } = user;
+        const { _id, email, name, role, isVerified, hasPaidEntry } = user;
 
         res.json(
             successAction({
                 token,
-                user: { _id, email, name, role, isVerified }
+                user: { _id, email, name, role, isVerified, hasPaidEntry }
+                // user
             })
         )
     })

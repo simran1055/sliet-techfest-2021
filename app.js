@@ -14,6 +14,7 @@ const domainRoutes = require('./routes/domain')
 const coordinatorRoutes = require('./routes/coordinator')
 const sponsorRoutes = require('./routes/sponsor')
 const eventsRoutes = require('./routes/event')
+const paymentRoutes = require('./routes/payment')
 
 // Constatns 
 const PORT = process.env.PORT || 4000; //Server Port
@@ -37,7 +38,7 @@ app.use('/api', domainRoutes);
 app.use('/api', coordinatorRoutes);
 app.use('/api', sponsorRoutes);
 app.use('/api', eventsRoutes);
-
+app.use('/api', paymentRoutes);
 app.use('//', (req, res) => {
     res.send('Welcome :)')
 });
@@ -46,3 +47,4 @@ app.use('//', (req, res) => {
 app.listen(PORT, () => {
     console.log(`Server is running at Port ${PORT}`);
 })
+
