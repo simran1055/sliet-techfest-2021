@@ -79,7 +79,7 @@ const userSchema = new mongoose.Schema({
     },
     salt: String,
     //0 for normal user ,1 for admin, 2 for super admin
-    //Todo create a super admin
+
     role: {
         type: Number,
         default: 0
