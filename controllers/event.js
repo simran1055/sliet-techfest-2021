@@ -24,8 +24,12 @@ exports.updateEvent = async (req, res) => {
     }
 
     // Must be same User or Super admin that is '2'
-    if (isEvent.eventCreatedBy != req.user._id || req.user.role != 2) {
+
+    if (!(isEvent.eventCreatedBy == req.user._id || req.user.role == 2)) {
         return res.send(failAction('You are not authorized to update this event'))
+    }
+    if(req.user.role != 2){
+        delete req.body['isActive'];
     }
     Event.findOneAndUpdate(
         {
@@ -49,7 +53,7 @@ exports.deleteEvent = async (req, res) => {
     }
 
     // Must be same User or Super admin that is '2'
-    if (isEvent.eventCreatedBy != req.user._id || req.user.role != 2) {
+    if (!(isEvent.eventCreatedBy == req.user._id || req.user.role == 2)) {
         return res.send(failAction('You are not authorized to update this event'))
     }
     Event.findOneAndUpdate({
@@ -75,7 +79,7 @@ exports.eventListAdmin = (req, res) => {
         // Super admin can see all Events Except Deleted.
         isActive: { $lt: 3 }
     };
-    Event.find({}, payload, (err, event) => {
+    Event.find( payload, (err, event) => {
         if (err) {
             return res.send(failAction('Some error accoured'))
         }
@@ -88,7 +92,7 @@ exports.eventList = (req, res) => {
         // User can only see approved Events
         isApproved: true
     };
-    Event.find({}, payload, (err, event) => {
+    Event.find( payload, (err, event) => {
         if (err) {
             return res.send(failAction('Some error accoured'))
         }
@@ -100,9 +104,6 @@ exports.eventVerify = (req, res) => {
     if (req.user.role != 2) {
         return res.send(failAction('You are not authorized to update this event'))
     }
-    let payload = {
-        isApproved: true
-    };
     Event.findOneAndUpdate(
         {
             _id: req.body._id

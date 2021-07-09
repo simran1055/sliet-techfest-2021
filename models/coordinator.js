@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const coordinatorchema = new mongoose.Schema({
+const coordinatorschema = new mongoose.Schema({
 
     coordinatorName: {
         type: String,
@@ -38,4 +38,4 @@ const coordinatorchema = new mongoose.Schema({
 })
 
 
-module.exports = mongoose.model("Coordinator", coordinatorchema)
+module.exports = mongoose.model("Coordinator", coordinatorschema)
