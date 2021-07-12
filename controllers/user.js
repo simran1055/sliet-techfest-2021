@@ -1,4 +1,5 @@
 const User = require("../models/user");
+const Team = require('../models/team')
 const Subscribers = require('../models/subscribers');
 const message = require('../utills/messages');
 const { mailFn } = require('../utills/mail');
@@ -136,6 +137,81 @@ exports.campusAmbassadorList = async (req, res) => {
     })
 }
 
+
+// Create Team 
+exports.createTeam = async (req, res) => {
+    let { totalTeamMember, teamMembers, eventId } = req.body
+    let teamLeader = req.user._id;
+    let teamLeaderData = await User.findById({ _id: teamLeader })
+    if (!teamLeaderData.hasPaidEntry) {
+        return res.send(failAction('Please pay you entry Fee'))
+    }
+
+    let allUserData = await User.find({ userId: { $in: teamMembers } })
+    let eventData = await Team.find({ eventId: eventId })
+    let notPaid = [];
+    let getId = [];
+    let alreadyRegInEvent = [];
+    allUserData.forEach(element => {
+        // Check If user is Paid or not
+        if (!element.hasPaidEntry) {
+            notPaid.push(element.name)
+        }
+
+        // Check If User already registerd in Other team of same evenet
+        eventData.find(({ usersId }) => {
+            if (usersId.find(({ userId }) => { userId.toString() === element._id.toString() })?.userId) {
+                console.log('User as a User');
+                alreadyRegInEvent.push(element.name)
+            }
+        })
+
+        // check If User already register as Leader
+        if (eventData.find(({ leaderId }) => leaderId.toString() === element._id.toString())) {
+            console.log('User as a Leader');
+            alreadyRegInEvent.push(element.name)
+        }
+
+        getId.push({ userId: element._id })
+    });
+
+    // Check If leader is already register as User
+    eventData.find(({ usersId }) => {
+        if (usersId.find(({ userId }) => { userId.toString() === teamLeader.toString() })) {
+            console.log('Team Leader as a User');
+            alreadyRegInEvent.push(element.name)
+        }
+    })
+
+    if (notPaid.length || alreadyRegInEvent.length) {
+        return res.send(failAction({
+            notPaid,
+            alreadyRegInEvent
+        }))
+    }
+
+    let payload = req.body;
+    delete payload["usersId"]
+    payload = {
+        ...payload, ...{
+            leaderId: req.user._id,
+            usersId: getId
+        }
+    }
+    // console.log(payload);
+    const team = new Team(payload);
+
+    team.save((err, team) => {
+        if (err) {
+            console.log(err);
+            return res.status(400).json(
+                failAction("Some error ocuured")
+            )
+        }
+        res.send(team);
+    })
+}
+
 exports.testMessage = (req, res) => {
     ejs.renderFile("public/notify.ejs", function (err, data) {
         mailFn({
@@ -146,3 +222,5 @@ exports.testMessage = (req, res) => {
         res.send('Message Sent')
     })
 }
+
+

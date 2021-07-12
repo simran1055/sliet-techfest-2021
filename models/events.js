@@ -22,7 +22,7 @@ const EventrSchema = new mongoose.Schema({
         type: Date,
         require: true
     },
-    EndDate: {
+    endDate: {
         type: Date,
         require: true
     },

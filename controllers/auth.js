@@ -200,7 +200,7 @@ exports.isAuthenticated = (req, res, next) => {
     let checker = req.profile && req.auth && req.auth._id == req.profile._id;
     console.log(req.auth)
     if (!checker) {
-        res.status(403).json({
+       return res.status(403).json({
             error: "Access Denied , Not authenticated"
         })
     }

@@ -25,15 +25,15 @@ const workshopSchema = new mongoose.Schema({
         required: true,
         maxlength: 200
     },
-    workshopSessions: [{ type: ObjectId, ref: 'WorkshopSession' }],
+    // workshopSessions: [{ type: ObjectId, ref: 'WorkshopSession' }],
     studentCoordinator: [{ type: ObjectId, ref: 'Coordinator' }],
     // facultyCoordinator: [{ type: ObjectId, ref: 'Coordinator' }],
     photo: {
         // data: Buffer,
         // contentType: String
         type: String,
-        required: true,
-        trim: true,
+        // required: true,
+        // trim: true,
     }
 })
 
