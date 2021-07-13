@@ -31,5 +31,4 @@ router.delete(
     deleteWorkshopSession
 );
 
-router.get("/workshopSession/photo/:workshopSessionId", photo);
 module.exports = router;

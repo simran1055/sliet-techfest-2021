@@ -23,7 +23,7 @@ exports.signUp = async (req, res) => {
     //     return res.status(400).json(failAction('Email is already registerd'));
     // }
 
-    let count = await User.count();
+    let count = await User.countDocuments();
     let emailAr = req.body.email.split("@");
     let use = emailAr[0];
     let domain = emailAr[1];
@@ -200,7 +200,7 @@ exports.isAuthenticated = (req, res, next) => {
     let checker = req.profile && req.auth && req.auth._id == req.profile._id;
     console.log(req.auth)
     if (!checker) {
-       return res.status(403).json({
+        return res.status(403).json({
             error: "Access Denied , Not authenticated"
         })
     }

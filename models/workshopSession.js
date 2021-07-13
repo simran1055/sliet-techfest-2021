@@ -1,9 +1,12 @@
 const mongoose = require('mongoose');
-
+const { ObjectId } = mongoose.Schema;
 const workshopSessionSchema = new mongoose.Schema({
 
     // Date and time, Scheduled Link, Serial Number
-
+    workshopSessionName: {
+        type: String,
+        required: true
+    },
     dateTime: {
         type: Date,
         required: true
@@ -13,13 +16,14 @@ const workshopSessionSchema = new mongoose.Schema({
         required: true,
         trim: true
     },
-    worshopSessionId: {
+    workshopSessionId: {
         type: String,
-        required: true
+        required: true,
+        unique: true
     },
     workshopId: {
         type: ObjectId,
-        ref: 'WorkshopSession'
+        ref: 'Workshop'
     }
 
 })
