@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const { createHmac } = require('crypto');
 const uuidv4 = require('uuid');
-
+const { ObjectId } = mongoose.Schema;
 const userSchema = new mongoose.Schema({
     name: {
         type: String,
@@ -104,7 +104,7 @@ const userSchema = new mongoose.Schema({
         default: 0
     },
 
-
+    workshopsEnrolled: [{ type: ObjectId, ref: 'Workshop' }],
     campusAmbassador: {
         refCode: {
             type: String

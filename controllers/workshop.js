@@ -4,7 +4,8 @@ const formidable = require("formidable");
 const fs = require("fs")
 const path = require("path")
 const _ = require("lodash");
-const { uploadFileFunc } = require("../utills/fileupload.js")
+const { uploadFileFunc } = require("../utills/fileupload.js");
+const WorkshopSession = require('../models/workshopSession');
 
 exports.getWorkshopById = (req, res, next, id) => {
     Workshop.findById(id).populate('studentCoordinator').exec((err, workshop1) => {
@@ -14,9 +15,31 @@ exports.getWorkshopById = (req, res, next, id) => {
             })
         }
 
+
+        // WorkshopSession.find({ workshopId: workshop1._id }).exec((err, workshopsessions) => {
+        //     // console.log(workshopsessions)
+        //     if (err || !workshopsessions) {
+        //         return res.status(400).json({
+        //             error: "Error while fetching Workshop"
+        //         })
+        //     }
+
+        //     workshop1.sessions = workshopsessions
+        //     console.log(workshop1)
         req.workshop1 = workshop1
+
+
         next();
+        // })
+        // req.workshop1.sessions = a;
+
+
+
     })
+
+
+
+
 }
 
 exports.createWorkshop = (req, res) => {

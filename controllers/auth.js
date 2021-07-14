@@ -210,21 +210,53 @@ exports.isAuthenticated = (req, res, next) => {
 
 
 
-///middle ware for isverified
-// exports.isVerified = (req, res, next) => {
-//     User.findById(req.auth._id).exec((err, user) => {
-//         if (err || !user) {
-//             return res.status(400).json({
-//                 error: "Error while fetching user"
-//             })
-//         }
+// /middle ware for isverified
+exports.isVerifiedCheck = (req, res, next) => {
+    User.findById(req.auth._id).exec((err, user) => {
+        if (err || !user) {
+            return res.status(400).json({
+                error: "Error while fetching user"
+            })
+        }
 
-//         if (user.isVerified != 1) return res.status(400).json(failAction('Verification Failed'))
-//         next();
-//     })
+        if (user.isVerified != 1) return res.status(400).json(failAction('Verification Failed'))
+        next();
+    })
+
+}
+
+/// has paid the fees
+
+exports.hasPaidEntryCheck = (req, res, next) => {
+    User.findById(req.auth._id).exec((err, user) => {
+        if (err || !user) {
+            return res.status(400).json({
+                error: "Error while fetching user"
+            })
+        }
+
+        if (user.hasPaidEntry != 1) return res.status(400).json(failAction('Entry fee not paid'))
+        next();
+    })
 
 
-// }
+}
+/// is profile complete
+
+exports.isProfileCompleteCheck = (req, res, next) => {
+    User.findById(req.auth._id).exec((err, user) => {
+        if (err || !user) {
+            return res.status(400).json({
+                error: "Error while fetching user"
+            })
+        }
+
+        if (user.isProfileComplete != 1) return res.status(400).json(failAction('Profile not complete'))
+        next();
+    })
+
+
+}
 
 
 exports.isAdmin = (req, res, next) => {
