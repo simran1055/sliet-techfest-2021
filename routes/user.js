@@ -1,7 +1,8 @@
 const express = require('express');;
 var router = express.Router();
-const { getUserById, getUser, updateUser, notify, campusAmbassador, campusAmbassadorListAdmin, campusAmbassadorList, createTeam, testMessage } = require("../controllers/user")
-const { isAuthenticated, isSignedIn, isAdmin, isAuthenticatedFn } = require("../controllers/auth")
+const { getUserById, getUser, updateUser, notify, campusAmbassador, campusAmbassadorListAdmin, campusAmbassadorList, createTeam, testMessage, enrollUserinWorkshop } = require("../controllers/user")
+const { isAuthenticated, isSignedIn, isAdmin, isAuthenticatedFn, isVerifiedCheck, hasPaidEntryCheck, isProfileCompleteCheck } = require("../controllers/auth");
+const { getWorkshopById } = require('../controllers/workshop');
 
 // Capmus Ambassador Routes
 router.post('/user/campus-ambassador', isSignedIn, isAuthenticatedFn, campusAmbassador);
@@ -21,5 +22,13 @@ router.put('/user/:userId', isSignedIn, isAuthenticated, updateUser);
 // Notification Routes
 router.post('/user/notify', notify)
 router.post('/user/test-message', testMessage)
+
+
+//////////// workshop related
+
+router.param('workshopId', getWorkshopById);
+
+router.post('/user/:userId/workshop/:workshopId', isSignedIn, isAuthenticated, isVerifiedCheck, hasPaidEntryCheck, isProfileCompleteCheck, enrollUserinWorkshop)
+
 
 module.exports = router;

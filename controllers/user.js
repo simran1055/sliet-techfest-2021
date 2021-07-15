@@ -30,11 +30,46 @@ exports.getUser = (req, res) => {
 }
 
 exports.updateUser = (req, res) => {
+
+
     delete req.body['email'];
     delete req.body['role'];
     delete req.body['userId'];
     delete req.body['isProfileComplete'];
     delete req.body['isVerified'];
+
+    const { name,
+        lastName,
+        email,
+        phone,
+        dob,
+        designation,
+        collegeName,
+        collegeAddress,
+        courseEnrolled,
+        branchOfStudy,
+        yearOfStudy,
+        whatsappPhoneNumber,
+        telegramPhoneNumber } = req.body
+
+    if (
+
+        !lastName || !phone || !dob || !designation
+        || !collegeName
+        || !collegeAddress
+        || !courseEnrolled
+        || !branchOfStudy
+        || !yearOfStudy
+        || !whatsappPhoneNumber
+        || !telegramPhoneNumber
+    ) {
+        req.body['isProfileComplete'] = 0;
+    } else {
+        req.body['isProfileComplete'] = 1;
+    }
+
+
+
     User.findByIdAndUpdate(
         { _id: req.profile._id },
         {
@@ -158,6 +193,7 @@ exports.createTeam = async (req, res) => {
 
     // for User
     let userId = await User.find({ userId: { $in: teamMembers } }, { _id: 1, email: 1, name: 1 })
+
     userId.forEach(element => {
         let uuIdCode = uuidv4.v4()
         getId = { ...getId, ...{ userId: element._id, inviteCode: uuIdCode } }
@@ -175,7 +211,14 @@ exports.createTeam = async (req, res) => {
 
     // sendmail
     email.forEach(element => {
+        ejs.renderFile("public/testVerification.ejs", { payload: element }, function (err, data) {
 
+            mailFn({
+                to: element.email,
+                subject: 'You are invited to Team',
+                html: data
+            })
+        })
     });
     console.log(email);
 
@@ -249,5 +292,53 @@ exports.testMessage = (req, res) => {
         res.send('Message Sent')
     })
 }
+
+
+////////// workshop related
+
+exports.enrollUserinWorkshop = (req, res) => {
+    let workshops = [req.workshop1._id];
+    // console.log(req.profile.workshopsEnrolled)
+    // console.log(req.workshop1._id)
+    var flag = 0
+    req.profile.workshopsEnrolled.find(ele => {
+        if (ele.equals(req.workshop1._id)) {
+            flag = 1
+            console.log('hoi')
+        } else {
+            console.log('jdahg')
+        }
+
+    })
+    if (flag == 1) {
+        return res.status(400).json({
+            error: "Already registered"
+        })
+    }
+
+    // store this in db
+    User.findOneAndUpdate(
+        { _id: req.profile._id },
+        { $push: { workshopsEnrolled: workshops } },
+        { new: true, useFindAndModify: false },
+        (err, user) => {
+            if (err || !user) {
+                return res.status(400).json({
+                    error: "Unable to enroll in workshop"
+                });
+            }
+            return res.status(200).json(user)
+
+        }
+    );
+}
+
+
+
+
+
+
+
+
 
 
