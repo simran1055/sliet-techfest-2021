@@ -5,6 +5,8 @@ const fs = require("fs")
 const path = require("path")
 const _ = require("lodash");
 const { uploadFileFunc } = require("../utills/fileupload.js")
+const shortid = require('shortid')
+
 // Pad number 
 function pad(number, length) {
 
@@ -55,7 +57,8 @@ exports.createWorkshopSession = async (req, res) => {
 
 
         let count = await WorkshopSession.countDocuments();
-        let workshopSessionId = '#TFWS' + pad(count + 1, 3).toString();
+        // let workshopSessionId = '#TFWS' + pad(count + 1, 3).toString();
+        let workshopSessionId = '#TF' + shortid.generate().toString();;
         let workshopSession1 = new WorkshopSession({
             dateTime,
             scheduledLink,

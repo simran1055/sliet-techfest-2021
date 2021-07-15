@@ -15,22 +15,21 @@ exports.getWorkshopById = (req, res, next, id) => {
             })
         }
 
-
-        // WorkshopSession.find({ workshopId: workshop1._id }).exec((err, workshopsessions) => {
-        //     // console.log(workshopsessions)
-        //     if (err || !workshopsessions) {
-        //         return res.status(400).json({
-        //             error: "Error while fetching Workshop"
-        //         })
-        //     }
-
-        //     workshop1.sessions = workshopsessions
-        //     console.log(workshop1)
         req.workshop1 = workshop1
+        WorkshopSession.find({ workshopId: workshop1._id }).exec((err, workshopsessions) => {
+            // console.log(workshopsessions)
+            if (err || !workshopsessions) {
+                return res.status(400).json({
+                    error: "Error while fetching Workshop"
+                })
+            }
+
+            req.workshopSessions = workshopsessions
 
 
-        next();
-        // })
+
+            next();
+        })
         // req.workshop1.sessions = a;
 
 
@@ -134,7 +133,7 @@ exports.createWorkshop = (req, res) => {
 
 exports.getWorkshop = (req, res) => {
     // req.workshop1.photo = undefined;
-    return res.json(req.workshop1)
+    return res.json({ workshop: req.workshop1, sessions: req.workshopSessions })
 }
 
 //middleware

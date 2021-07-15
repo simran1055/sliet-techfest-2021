@@ -29,11 +29,46 @@ exports.getUser = (req, res) => {
 }
 
 exports.updateUser = (req, res) => {
+
+
     delete req.body['email'];
     delete req.body['role'];
     delete req.body['userId'];
     delete req.body['isProfileComplete'];
     delete req.body['isVerified'];
+
+    const { name,
+        lastName,
+        email,
+        phone,
+        dob,
+        designation,
+        collegeName,
+        collegeAddress,
+        courseEnrolled,
+        branchOfStudy,
+        yearOfStudy,
+        whatsappPhoneNumber,
+        telegramPhoneNumber } = req.body
+
+    if (
+
+        !lastName || !phone || !dob || !designation
+        || !collegeName
+        || !collegeAddress
+        || !courseEnrolled
+        || !branchOfStudy
+        || !yearOfStudy
+        || !whatsappPhoneNumber
+        || !telegramPhoneNumber
+    ) {
+        req.body['isProfileComplete'] = 0;
+    } else {
+        req.body['isProfileComplete'] = 1;
+    }
+
+
+
     User.findByIdAndUpdate(
         { _id: req.profile._id },
         {
