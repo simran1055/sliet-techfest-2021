@@ -103,8 +103,7 @@ const userSchema = new mongoose.Schema({
         type: Boolean,
         default: 0
     },
-
-
+    eventRegIn: [],
     campusAmbassador: {
         refCode: {
             type: String

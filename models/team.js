@@ -17,8 +17,11 @@ const TeamSchema = new mongoose.Schema({
                 type: Number,
                 required: true,
                 default: 1
-            }
+            },
             // 0 for inactive 1 for active 2 for suspend and 3 for delete
+            inviteCode: {
+                type: String
+            }
         }
     ],
     leaderId: {

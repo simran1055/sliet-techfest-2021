@@ -7,6 +7,7 @@ const { mailTestFn } = require('../utills/mail-test');
 const { validationResult } = require('express-validator');
 const { successAction, failAction } = require('../utills/response');
 const { generateRandom } = require('../utills/tokens');
+const uuidv4 = require('uuid');
 var ejs = require("ejs");
 exports.getUserById = (req, res, next, id) => {
     User.findById(id).exec((err, user) => {
@@ -138,8 +139,53 @@ exports.campusAmbassadorList = async (req, res) => {
 }
 
 
-// Create Team 
+
 exports.createTeam = async (req, res) => {
+    let { totalTeamMember, teamMembers, eventId } = req.body
+    let getId = {}
+    let names = []
+    let email = []
+    // For team leader
+    let leaderId = req.user._id;
+    let leaderData = await User.findById({ _id: leaderId })
+    let leaderEvent = await Team.find({ $or: [{ leaderId }, { "usersId": { $elemMatch: { userId: leaderId } } }] })
+    if (leaderEvent.length || !leaderData.hasPaidEntry) {
+        return res.send(failAction({
+            notPaid: !leaderData.hasPaidEntry ? 'You has not paid entry fee' : '',
+            alreadyRegInEvent: 'You are already registerd in this event'
+        }))
+    }
+
+    // for User
+    let userId = await User.find({ userId: { $in: teamMembers } }, { _id: 1, email: 1, name: 1 })
+    userId.forEach(element => {
+        let uuIdCode = uuidv4.v4()
+        getId = { ...getId, ...{ userId: element._id, inviteCode: uuIdCode } }
+        email.push({
+            email: element.email,
+            name: element.name,
+            id: element._id,
+            inviteCode: uuIdCode
+        })
+    });
+    let userEventData = await Team.find({ $or: [{ getId }, { "usersId": { $elemMatch: { getId } } }] })
+    // todo if someone is registered
+
+    //
+
+    // sendmail
+    email.forEach(element => {
+
+    });
+    console.log(email);
+
+
+    res.send(userEventData)
+
+}
+
+// Create Team 
+exports.createTeam1 = async (req, res) => {
     let { totalTeamMember, teamMembers, eventId } = req.body
     let teamLeader = req.user._id;
     let teamLeaderData = await User.findById({ _id: teamLeader })
@@ -147,60 +193,41 @@ exports.createTeam = async (req, res) => {
         return res.send(failAction('Please pay you entry Fee'))
     }
 
+    let leader = await User.find({ userId: { $in: teamMembers } })
+
     let allUserData = await User.find({ userId: { $in: teamMembers } })
-    let eventData = await Team.find({ eventId: eventId })
     let notPaid = [];
-    let getId = [];
+    let getId = {}
     let alreadyRegInEvent = [];
     allUserData.forEach(element => {
         // Check If user is Paid or not
         if (!element.hasPaidEntry) {
             notPaid.push(element.name)
+        } else {
+            getId = { ...getId, ...{ userId: element._id } }
         }
-
-        // Check If User already registerd in Other team of same evenet
-        eventData.find(({ usersId }) => {
-            if (usersId.find(({ userId }) => { userId.toString() === element._id.toString() })?.userId) {
-                console.log('User as a User');
-                alreadyRegInEvent.push(element.name)
-            }
-        })
-
-        // check If User already register as Leader
-        if (eventData.find(({ leaderId }) => leaderId.toString() === element._id.toString())) {
-            console.log('User as a Leader');
-            alreadyRegInEvent.push(element.name)
-        }
-
-        getId.push({ userId: element._id })
     });
 
-    // Check If leader is already register as User
-    eventData.find(({ usersId }) => {
-        if (usersId.find(({ userId }) => { userId.toString() === teamLeader.toString() })) {
-            console.log('Team Leader as a User');
-            alreadyRegInEvent.push(element.name)
-        }
-    })
-
-    if (notPaid.length || alreadyRegInEvent.length) {
+    if (notPaid.length || !getId?.userId) {
         return res.send(failAction({
             notPaid,
             alreadyRegInEvent
         }))
     }
-
+    let eventData = await Team.find({ "usersId": { $elemMatch: getId } })
+    console.log('>>>', eventData);
+    return res.send(eventData)
     let payload = req.body;
     delete payload["usersId"]
+    let arr = []
+    arr.push(getId)
     payload = {
         ...payload, ...{
             leaderId: req.user._id,
-            usersId: getId
+            usersId: arr
         }
     }
-    // console.log(payload);
     const team = new Team(payload);
-
     team.save((err, team) => {
         if (err) {
             console.log(err);
