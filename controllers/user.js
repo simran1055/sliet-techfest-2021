@@ -313,6 +313,8 @@ exports.enrollUserinWorkshop = (req, res) => {
                     error: "Unable to enroll in workshop"
                 });
             }
+            user.salt = undefined;
+            user.encryPassword = undefined;
             return res.status(200).json(user)
 
         }
