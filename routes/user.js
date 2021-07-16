@@ -1,6 +1,6 @@
 const express = require('express');;
 var router = express.Router();
-const { getUserById, getUser, updateUser, notify, campusAmbassador, campusAmbassadorListAdmin, campusAmbassadorList, createTeam, testMessage, enrollUserinWorkshop } = require("../controllers/user")
+const { getUserById, getUser, updateUser, notify, campusAmbassador, campusAmbassadorListAdmin, campusAmbassadorList, updateTeam, createTeam, removeTeamMember, acceptTeamLink, testMessage, enrollUserinWorkshop } = require("../controllers/user")
 const { isAuthenticated, isSignedIn, isAdmin, isAuthenticatedFn, isVerifiedCheck, hasPaidEntryCheck, isProfileCompleteCheck } = require("../controllers/auth");
 const { getWorkshopById } = require('../controllers/workshop');
 
@@ -11,7 +11,9 @@ router.post('/user/campus-ambassador-list', isSignedIn, isAuthenticatedFn, campu
 
 // Team Routes 
 router.post('/user/create-team', isSignedIn, isAuthenticatedFn, isProfileCompleteCheck, createTeam);
-router.post('/user/accept-team', createTeam);
+router.post('/user/accept-team', acceptTeamLink);
+router.post('/user/remove-team-member', isSignedIn, isAuthenticatedFn, removeTeamMember)
+router.post('/user/update-team', isSignedIn, isAuthenticatedFn, updateTeam)
 
 // Users Route
 router.param('userId', getUserById);

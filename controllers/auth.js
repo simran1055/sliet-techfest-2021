@@ -147,37 +147,37 @@ exports.verify = async (req, res) => {
         })
     }
 
-    const { vf, id, type } = req.body;
-    User.findOne({ _id: id }, (err, user) => {
+    const { vf, id } = req.body;
+    // User.findOne({ _id: id }, (err, user) => {
 
-        if (err) {
-            return res.json(failAction('User not found.'))
-        }
+    //     if (err) {
+    //         return res.json(failAction('User not found.'))
+    //     }
 
-        if (user.isVerified) {
-            return res.json(successAction('User already Verified.'))
-        }
+    //     if (user.isVerified) {
+    //         return res.json(successAction('User already Verified.'))
+    //     }
 
-        if (user.verificationCode == vf) {
-            User.findByIdAndUpdate(
-                { _id: id },
-                { $set: { isVerified: true } },
-                (err, user) => {
-                    if (err) {
-                        return res.status(400).json(failAction('Verification Failed'))
-                    }
-                    let { _id, email, name, role } = user;
-                    return res.json(successAction({
-                        user: { _id, email, name, role, isVerified: true }
-                    }))
-                }
-            )
+    //     if (user.verificationCode == vf) {
+    User.findByIdAndUpdate(
+        { _id: id, verificationCode: vf },
+        { $set: { isVerified: true } },
+        (err, user) => {
+            if (err) {
+                return res.status(400).json(failAction('Verification Failed'))
+            }
+            let { _id, email, name, role } = user;
+            return res.json(successAction({
+                user: { _id, email, name, role, isVerified: true }
+            }))
         }
-        else {
-            return res.json(failAction('Verification Faild'))
-        }
+    )
+    // }
+    //     else {
+    //         return res.json(failAction('Verification Faild'))
+    //     }
 
-    })
+    // })
 }
 
 exports.signOut = (req, res) => {

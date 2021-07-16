@@ -10,6 +10,8 @@ const { successAction, failAction } = require('../utills/response');
 const { generateRandom } = require('../utills/tokens');
 const uuidv4 = require('uuid');
 var ejs = require("ejs");
+const { verify } = require("./auth");
+const { findById } = require("../models/user");
 exports.getUserById = (req, res, next, id) => {
     User.findById(id).exec((err, user) => {
         if (err || !user) {
@@ -189,15 +191,16 @@ exports.createTeam = async (req, res) => {
     let email = [];
     let getId = [];
     let updateId = []
-    
-    if(totalTeamMember < teamMembers.length){
+
+    if (totalTeamMember < teamMembers.length) {
         return res.send(failAction('Number of Team members are more then total team meambers'))
     }
 
     // let usersData = await User.find({ $or: [{ userId: { $in: teamMembers } }], eventRegIn: { $in: mongoose.Types.ObjectId(eventId) } }, { name: 1 })
-    
+
     let usersData = await User.find({ userId: { $in: [...teamMembers, ...[teamLeader]] } })
     usersData.forEach(element => {
+
         // check if anyone in event
         let inEvent = element.eventRegIn.find(x => x == eventId)
         if (inEvent) {
@@ -214,7 +217,7 @@ exports.createTeam = async (req, res) => {
                 email.push({
                     email: element.email,
                     name: element.name,
-                    confirm_link: "https://techfestsliet.com/?id=" + element._id + "&vf=" + uuIdCode + "&type=team"
+                    confirm_link: "https://techfestsliet.com/?id=" + element._id + "&code=" + uuIdCode + "&event=" + eventId
                 })
             }
         }
@@ -227,7 +230,6 @@ exports.createTeam = async (req, res) => {
 
     let payload = req.body;
     delete payload["usersId"]
-
     payload = {
         ...payload, ...{
             leaderId: req.user._id,
@@ -236,6 +238,7 @@ exports.createTeam = async (req, res) => {
     }
 
     const team = new Team(payload);
+
     team.save((err, team) => {
         if (err) {
             console.log(err);
@@ -265,6 +268,142 @@ exports.createTeam = async (req, res) => {
 
 // Accept Team Link 
 exports.acceptTeamLink = async (req, res) => {
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+        return res.status(422).json({
+            error: errors.array()[0].msg
+        })
+    }
+
+    const { code, id, eventId } = req.body;
+
+    Team.findOneAndUpdate(
+        { eventId, "usersId.userId": id, "usersId.inviteCode": code },
+        { $set: { "usersId.$.isAccepted": true } },
+        { new: true, useFindAndModify: false },
+        (err, user) => {
+            if (err) {
+                return res.status(400).json(failAction('Something went wrong'))
+            }
+            if (!user) {
+                return res.status(400).json(failAction('Something went wrong'))
+            }
+            return res.json(successAction(user, 'verify Success'))
+        }
+    )
+}
+
+// Remove Team Member
+exports.removeTeamMember = (req, res) => {
+    let { userToRemove, eventId } = req.body
+    let userRemoveBy = req.user._id
+    Team.findOne({ eventId, "usersId.userId": userToRemove }, (err, user) => {
+        if (err || !user) {
+            return res.send(failAction('User Not Found'))
+        }
+        if (userRemoveBy == user.leaderId || userRemoveBy == userToRemove) {
+            Team.findOneAndUpdate(
+                { eventId, "usersId.userId": userToRemove },
+                { $pull: { "usersId": { userId: userToRemove } } },
+                { new: true, useFindAndModify: false },
+                (err, user) => {
+                    if (err) {
+                        return res.status(400).json(failAction('Something went wrong'))
+                    }
+                    if (!user) {
+                        return res.status(400).json(failAction('Something went wrong'))
+                    }
+                    return res.json(successAction('', 'User Left the Team'))
+                }
+            )
+        } else {
+            return res.send(failAction('You cant remove this user from Team'))
+        }
+
+    })
+}
+
+exports.updateTeam = async (req, res) => {
+    let { teamMembers, totalTeamMember, eventId } = req.body;
+    let updateId = [];
+    let getId = [];
+    let email = [];
+    let payload = req.body;
+
+    Team.findOne({ eventId, leaderId: req.user._id }, (err, user) => {
+        if (err || !user) {
+            return res.send(failAction('User Not Found'))
+        }
+
+        if (teamMembers.length && (totalTeamMember == user.totalTeamMember || totalTeamMember > user.totalTeamMember)) {
+            User.find({ userId: { $in: teamMembers } }, (err, usersData) => {
+                usersData.forEach(element => {
+
+                    // check if anyone in event
+                    let inEvent = element.eventRegIn.find(x => x == eventId)
+                    if (inEvent) {
+                        alreadyInEvent.push(element.name)
+                    }
+                    else {
+
+                        let uuIdCode = uuidv4.v4()
+                        updateId.push(element._id)
+                        getId.push({
+                            userId: element._id,
+                            inviteCode: uuIdCode
+                        })
+                        email.push({
+                            email: element.email,
+                            name: element.name,
+                            confirm_link: "https://techfestsliet.com/?id=" + element._id + "&code=" + uuIdCode + "&event=" + eventId
+                        })
+
+                    }
+                })
+
+                if (alreadyInEvent.length) {
+                    return res.send(failAction({ alreadyInEvent, notPaidFee }))
+                }
+
+                email.forEach(element => {
+                    ejs.renderFile("public/testVerification.ejs", { payload: element }, function (err, data) {
+                        mailFn({
+                            to: element.email,
+                            subject: 'Invitation To Join Team',
+                            html: data
+                        })
+                    })
+                });
+
+                delete payload["usersId"]
+                payload = {
+                    ...payload, ...{
+                        leaderId: req.user._id,
+                        usersId: getId
+                    }
+                }
+            })
+        }
+    })
+
+
+    Team.findOneAndUpdate(
+        { eventId, leaderId: req.user._id },
+        { $set: payload },
+        { new: true, useFindAndModify: false },
+        (err, user) => {
+            if (err) {
+                return res.send(failAction('Something went wrong'))
+            }
+            res.send(user)
+        }
+    )
+
+    let updates = await User.updateMany(
+        { _id: { $in: updateId } },
+        { $push: { eventRegIn: eventId } },
+        { new: true, useFindAndModify: false })
 
 }
 
