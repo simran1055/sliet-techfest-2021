@@ -1,4 +1,5 @@
 const User = require("../models/user");
+const mongoose = require('mongoose');
 const Team = require('../models/team')
 const Subscribers = require('../models/subscribers');
 const message = require('../utills/messages');
@@ -174,102 +175,66 @@ exports.campusAmbassadorList = async (req, res) => {
 }
 
 
-
 exports.createTeam = async (req, res) => {
-    let { totalTeamMember, teamMembers, eventId } = req.body
-    let getId = {}
-    let names = []
-    let email = []
-    // For team leader
+
+    let {
+        totalTeamMember,
+        teamMembers,
+        eventId,
+        teamLeader
+    } = req.body
     let leaderId = req.user._id;
-    let leaderData = await User.findById({ _id: leaderId })
-    let leaderEvent = await Team.find({ $or: [{ leaderId }, { "usersId": { $elemMatch: { userId: leaderId } } }] })
-    if (leaderEvent.length || !leaderData.hasPaidEntry) {
-        return res.send(failAction({
-            notPaid: !leaderData.hasPaidEntry ? 'You has not paid entry fee' : '',
-            alreadyRegInEvent: 'You are already registerd in this event'
-        }))
+    let alreadyInEvent = [];
+    let notPaidFee = [];
+    let email = [];
+    let getId = [];
+    let updateId = []
+    
+    if(totalTeamMember < teamMembers.length){
+        return res.send(failAction('Number of Team members are more then total team meambers'))
     }
 
-    // for User
-    let userId = await User.find({ userId: { $in: teamMembers } }, { _id: 1, email: 1, name: 1 })
-
-    userId.forEach(element => {
-        let uuIdCode = uuidv4.v4()
-        getId = { ...getId, ...{ userId: element._id, inviteCode: uuIdCode } }
-        email.push({
-            email: element.email,
-            name: element.name,
-            id: element._id,
-            inviteCode: uuIdCode
-        })
-    });
-    let userEventData = await Team.find({ $or: [{ getId }, { "usersId": { $elemMatch: { getId } } }] })
-    // todo if someone is registered
-
-    //
-
-    // sendmail
-    email.forEach(element => {
-        ejs.renderFile("public/testVerification.ejs", { payload: element }, function (err, data) {
-
-            mailFn({
-                to: element.email,
-                subject: 'You are invited to Team',
-                html: data
-            })
-        })
-    });
-    console.log(email);
-
-
-    res.send(userEventData)
-
-}
-
-// Create Team 
-exports.createTeam1 = async (req, res) => {
-    let { totalTeamMember, teamMembers, eventId } = req.body
-    let teamLeader = req.user._id;
-    let teamLeaderData = await User.findById({ _id: teamLeader })
-    if (!teamLeaderData.hasPaidEntry) {
-        return res.send(failAction('Please pay you entry Fee'))
-    }
-
-    let leader = await User.find({ userId: { $in: teamMembers } })
-
-    let allUserData = await User.find({ userId: { $in: teamMembers } })
-    let notPaid = [];
-    let getId = {}
-    let alreadyRegInEvent = [];
-    allUserData.forEach(element => {
-        // Check If user is Paid or not
-        if (!element.hasPaidEntry) {
-            notPaid.push(element.name)
-        } else {
-            getId = { ...getId, ...{ userId: element._id } }
+    // let usersData = await User.find({ $or: [{ userId: { $in: teamMembers } }], eventRegIn: { $in: mongoose.Types.ObjectId(eventId) } }, { name: 1 })
+    
+    let usersData = await User.find({ userId: { $in: [...teamMembers, ...[teamLeader]] } })
+    usersData.forEach(element => {
+        // check if anyone in event
+        let inEvent = element.eventRegIn.find(x => x == eventId)
+        if (inEvent) {
+            alreadyInEvent.push(element.name)
         }
-    });
+        else {
+            if (leaderId != element._id) {
+                let uuIdCode = uuidv4.v4()
+                updateId.push(element._id)
+                getId.push({
+                    userId: element._id,
+                    inviteCode: uuIdCode
+                })
+                email.push({
+                    email: element.email,
+                    name: element.name,
+                    confirm_link: "https://techfestsliet.com/?id=" + element._id + "&vf=" + uuIdCode + "&type=team"
+                })
+            }
+        }
+    })
+    updateId.push(leaderId)
 
-    if (notPaid.length || !getId?.userId) {
-        return res.send(failAction({
-            notPaid,
-            alreadyRegInEvent
-        }))
+    if (alreadyInEvent.length) {
+        return res.send(failAction({ alreadyInEvent, notPaidFee }))
     }
-    let eventData = await Team.find({ "usersId": { $elemMatch: getId } })
-    console.log('>>>', eventData);
-    return res.send(eventData)
+
     let payload = req.body;
     delete payload["usersId"]
-    let arr = []
-    arr.push(getId)
+
     payload = {
         ...payload, ...{
             leaderId: req.user._id,
-            usersId: arr
+            usersId: getId
         }
     }
+
     const team = new Team(payload);
     team.save((err, team) => {
         if (err) {
@@ -280,6 +245,27 @@ exports.createTeam1 = async (req, res) => {
         }
         res.send(team);
     })
+
+    let updates = await User.updateMany(
+        { _id: { $in: updateId } },
+        { $push: { eventRegIn: eventId } },
+        { new: true, useFindAndModify: false })
+
+
+    email.forEach(element => {
+        ejs.renderFile("public/testVerification.ejs", { payload: element }, function (err, data) {
+            mailFn({
+                to: element.email,
+                subject: 'Invitation To Join Team',
+                html: data
+            })
+        })
+    });
+}
+
+// Accept Team Link 
+exports.acceptTeamLink = async (req, res) => {
+
 }
 
 exports.testMessage = (req, res) => {

@@ -147,7 +147,7 @@ exports.verify = async (req, res) => {
         })
     }
 
-    const { vf, id } = req.body;
+    const { vf, id, type } = req.body;
     User.findOne({ _id: id }, (err, user) => {
 
         if (err) {

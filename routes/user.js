@@ -10,7 +10,8 @@ router.post('/user/campus-ambassador-list-admin', isSignedIn, isAuthenticatedFn,
 router.post('/user/campus-ambassador-list', isSignedIn, isAuthenticatedFn, campusAmbassadorList);
 
 // Team Routes 
-router.post('/user/create-team', isSignedIn, isAuthenticatedFn, createTeam);
+router.post('/user/create-team', isSignedIn, isAuthenticatedFn, isProfileCompleteCheck, createTeam);
+router.post('/user/accept-team', createTeam);
 
 // Users Route
 router.param('userId', getUserById);

@@ -6,7 +6,8 @@ const TeamSchema = new mongoose.Schema({
         {
             userId: {
                 type: ObjectId,
-                required: true
+                required: true,
+                ref: 'User'
             },
             isAccepted: {
                 type: Boolean,
@@ -21,12 +22,14 @@ const TeamSchema = new mongoose.Schema({
             // 0 for inactive 1 for active 2 for suspend and 3 for delete
             inviteCode: {
                 type: String
-            }
+            },
+
         }
     ],
     leaderId: {
         type: ObjectId,
-        required: true
+        required: true,
+        ref: 'User'
     },
     eventId: {
         type: ObjectId,
@@ -34,7 +37,7 @@ const TeamSchema = new mongoose.Schema({
     },
     totalTeamMember: {
         type: Number,
-        required: true
+        required: true,
     },
     isParticipated: {
         type: Boolean,

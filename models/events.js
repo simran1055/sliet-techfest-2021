@@ -10,7 +10,8 @@ const EventrSchema = new mongoose.Schema({
     domainRefId: {
         type: ObjectId,
         require: true,
-        trim: true
+        trim: true,
+        ref: 'Domain'
     },
     eventCreatedDate: {
         type: Date,
@@ -36,10 +37,11 @@ const EventrSchema = new mongoose.Schema({
         require: true,
         trim: true
     },
-    eventCreatedBy:{
+    eventCreatedBy: {
         type: ObjectId,
         require: true,
-        trim: true
+        trim: true,
+        ref: 'User'
     },
     evnetLink: {
         type: String,
@@ -56,7 +58,9 @@ const EventrSchema = new mongoose.Schema({
         teamRef: {
             type: ObjectId,
             require: true,
-            trim: true
+            trim: true,
+            ref: 'User'
+
         }
     }],
     isApproved: {
