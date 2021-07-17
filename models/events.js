@@ -7,6 +7,10 @@ const EventrSchema = new mongoose.Schema({
         require: true,
         trim: true
     },
+    photo: {
+        type: String,
+        trim: true
+    },
     domainRefId: {
         type: ObjectId,
         require: true,
@@ -27,6 +31,8 @@ const EventrSchema = new mongoose.Schema({
         type: Date,
         require: true
     },
+
+    // todo min max
     participantCount: {
         type: String,
         require: true,
@@ -65,13 +71,16 @@ const EventrSchema = new mongoose.Schema({
     }],
     isApproved: {
         type: Boolean,
-        default: false
+        default: true
     },
     isActive: {
         type: Number,
         default: 1
-    }// 0 for inactive, 1 for active, 2 for suspended, 3 for delete
-
+    }, // 0 for inactive, 1 for active, 2 for suspended, 3 for delete
+    eventDescription: {
+        type: Streing,
+        require: true
+    }
 })
 
 module.exports = mongoose.model('Events', EventrSchema)

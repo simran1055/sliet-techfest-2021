@@ -33,7 +33,8 @@ const TeamSchema = new mongoose.Schema({
     },
     eventId: {
         type: ObjectId,
-        required: true
+        required: true,
+        ref: 'Events'
     },
     totalTeamMember: {
         type: Number,
