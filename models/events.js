@@ -17,39 +17,35 @@ const EventrSchema = new mongoose.Schema({
         trim: true,
         ref: 'Domain'
     },
-    eventCreatedDate: {
+    eventDate: {
         type: Date,
         require: true,
-        trim: true,
-        default: Date.now()
+
     },
-    startDate: {
-        type: Date,
-        require: true
-    },
-    endDate: {
+
+    regEndDate: {
         type: Date,
         require: true
     },
 
-    // todo min max
-    participantCount: {
-        type: String,
+    participantCountMin: {
+        type: Number,
         require: true,
-        trim: true
+        default: 1
     },
-    eventCordinatorName: {
-        type: String,
+    participantCountMax: {
+        type: Number,
         require: true,
-        trim: true
+        default: 1
     },
-    eventCreatedBy: {
-        type: ObjectId,
-        require: true,
-        trim: true,
-        ref: 'User'
-    },
-    evnetLink: {
+    eventCoordinator: [{ type: ObjectId, ref: "Coordinator" }],
+    // eventCreatedBy: {
+    //     type: ObjectId,
+    //     // require: true,
+    //     trim: true,
+    //     ref: 'User'
+    // },
+    eventLink: {
         type: String,
         // require: true,
         trim: true
@@ -63,7 +59,6 @@ const EventrSchema = new mongoose.Schema({
         },
         teamRef: {
             type: ObjectId,
-            require: true,
             trim: true,
             ref: 'User'
 
@@ -78,7 +73,7 @@ const EventrSchema = new mongoose.Schema({
         default: 1
     }, // 0 for inactive, 1 for active, 2 for suspended, 3 for delete
     eventDescription: {
-        type: Streing,
+        type: String,
         require: true
     }
 })
