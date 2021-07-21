@@ -4,7 +4,8 @@ const formidable = require("formidable");
 const fs = require("fs")
 const path = require("path")
 const _ = require("lodash");
-const { uploadFileFunc } = require("../utills/fileupload.js")
+const { uploadFileFunc } = require("../utills/fileupload.js");
+const Events = require('../models/events');
 
 exports.getDomainById = (req, res, next, id) => {
     Domain.findById(id).populate('studentCoordinator').populate('facultyCoordinator').exec((err, domain1) => {
@@ -15,7 +16,21 @@ exports.getDomainById = (req, res, next, id) => {
         }
 
         req.domain1 = domain1
-        next();
+
+
+        Events.find({ domainRefId: domain1._id }).populate('eventCoordinator').exec((err, events) => {
+            // console.log(workshopsessions)
+            // console.log(events)
+            if (err || !events) {
+                return res.status(400).json({
+                    error: "Error while fetching Workshop"
+                })
+            }
+
+            req.events = events
+            next();
+        })
+
     })
 }
 
@@ -106,7 +121,11 @@ exports.createDomain = (req, res) => {
 
 exports.getDomain = (req, res) => {
     // req.domain1.photo = undefined;
-    return res.json(req.domain1)
+    // var a = req.domain1
+    // a.events = req.events
+    // return res.json(a)
+
+    return res.json({ domain: req.domain1, events: req.events })
 }
 
 //middleware
