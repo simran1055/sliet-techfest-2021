@@ -19,9 +19,9 @@ exports.signUp = async (req, res) => {
     }
 
     // // if (await User.findOne({ name: req.body.name })) return res.status(400).json(failAction('Name is already registerd'));
-    // if (await User.findOne({ email: req.body.email })) {
-    //     return res.status(400).json(failAction('Email is already registerd'));
-    // }
+    if (await User.findOne({ email: req.body.email })) {
+        return res.status(400).json(failAction('Email is already registerd'));
+    }
 
     let count = await User.countDocuments();
     let emailAr = req.body.email.split("@");
@@ -29,6 +29,9 @@ exports.signUp = async (req, res) => {
     let domain = emailAr[1];
     let userId = '#TF' + pad(count + 1, 5).toString();
     let payload;
+
+
+
     if (domain == "sliet.ac.in") {
         let collegeName = "Sant Longowal Institute of Engineering and Technology";
         let regNo = use;
