@@ -15,7 +15,7 @@ exports.uploadFileFunc = (file) => {
     fs.writeFile(newPath, rawData, function (err) {
         if (err) {
 
-            return json({
+            return JSON({
                 error: err
             })
         }
