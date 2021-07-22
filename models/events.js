@@ -50,10 +50,7 @@ const EventrSchema = new mongoose.Schema({
         // require: true,
         trim: true
     },
-    prize: [{
-        type: Number,
-        default: 0
-    }],
+    prize: [],
     winningTeams: [{
         rank: {
             type: Number,
