@@ -1,5 +1,4 @@
 const User = require("../models/user");
-const mongoose = require('mongoose');
 const Team = require('../models/team')
 const Subscribers = require('../models/subscribers');
 const message = require('../utills/messages');
@@ -11,9 +10,10 @@ const { generateRandom } = require('../utills/tokens');
 const uuidv4 = require('uuid');
 var ejs = require("ejs");
 const { verify } = require("./auth");
-const { findById } = require("../models/user");
+
 exports.getUserById = (req, res, next, id) => {
-    User.findById(id).exec((err, user) => {
+    User.findById(id).populate('workshopsEnrolled').populate('eventRegIn').exec((err, user) => {
+        // console.log("user")
         if (err || !user) {
             return res.status(400).json({
                 error: "Error while fetching user"
@@ -21,6 +21,7 @@ exports.getUserById = (req, res, next, id) => {
         }
 
         req.profile = user
+
         next();
     })
 }
@@ -429,9 +430,9 @@ exports.enrollUserinWorkshop = (req, res) => {
     req.profile.workshopsEnrolled.find(ele => {
         if (ele.equals(req.workshop1._id)) {
             flag = 1
-            console.log('hoi')
+            // console.log('hoi')
         } else {
-            console.log('jdahg')
+            // console.log('jdahg')
         }
 
     })
@@ -459,6 +460,49 @@ exports.enrollUserinWorkshop = (req, res) => {
         }
     );
 }
+
+
+exports.enrollUserinEvent = (req, res) => {
+    let events = [req.event1._id];
+    // console.log(req.profile.workshopsEnrolled)
+    // console.log(req.workshop1._id)
+    var flag = 0
+    req.profile.eventRegIn.find(ele => {
+        if (ele.equals(req.event1._id)) {
+            flag = 1
+            // console.log('hoi')
+        } else {
+            // console.log('jdahg')
+        }
+
+    })
+    if (flag == 1) {
+        return res.status(400).json({
+            error: "Already registered"
+        })
+    }
+
+    // store this in db
+    User.findOneAndUpdate(
+        { _id: req.profile._id },
+        { $push: { eventRegIn: events } },
+        { new: true, useFindAndModify: false },
+        (err, user) => {
+            if (err || !user) {
+                return res.status(400).json({
+                    error: "Unable to enroll in workshop"
+                });
+            }
+            user.salt = undefined;
+            user.encryPassword = undefined;
+            return res.status(200).json(user)
+
+        }
+    );
+}
+
+
+
 
 
 

@@ -3,7 +3,7 @@ const fs = require("fs")
 exports.uploadFileFunc = (file) => {
 
     if (file.photo.size > 3000000) {
-        return json({
+        return ({
             error: "File size too big!"
         })
     }
@@ -15,7 +15,7 @@ exports.uploadFileFunc = (file) => {
     fs.writeFile(newPath, rawData, function (err) {
         if (err) {
 
-            return JSON({
+            return ({
                 error: err
             })
         }
