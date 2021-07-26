@@ -1,6 +1,6 @@
 const { check, cookie, validationResult } = require("express-validator");
 const uuidv4 = require('uuid');
-
+const { generateRandom } = require('../utills/tokens')
 const User = require("../models/user");
 const { mailFn } = require("../utills/mail");
 const { successAction, failAction } = require("../utills/response")
@@ -70,7 +70,7 @@ exports.signUp = async (req, res) => {
             to: req.body.email,
             subject: message.verificaton,
             html: `<h1>Thanks for REgistration ${user.name}</h1>
-                <p> <a href="https://sliet.movieshunters.com?vf=${user.verificationCode}?id=${user.id}"> Please Click here to verify </a></p>
+                <p> <a href="https://dev.techfestsliet.com/signin?vf=${user.verificationCode}&id=${user.id}"> Please Click here to verify </a></p>
             `
         })
 
@@ -106,7 +106,6 @@ exports.signIn = (req, res) => {
             )
         }
 
-
         // we can remove this and use middle ware also
         if (!user.isVerified) {
             return res.json(failAction('User is not verified. Please Verify you email.'))
@@ -117,7 +116,6 @@ exports.signIn = (req, res) => {
                 failAction("Email and password do not match.")
             )
         }
-
 
         // create a token
         const token = jwt.sign({ _id: user._id, role: user.role }, process.env.SECRET);
@@ -137,11 +135,9 @@ exports.signIn = (req, res) => {
             })
         )
     })
-
-
 }
 
-exports.verify = async (req, res) => {
+exports.changePassword = (req, res) => {
     const errors = validationResult(req);
 
     if (!errors.isEmpty()) {
@@ -149,38 +145,128 @@ exports.verify = async (req, res) => {
             error: errors.array()[0].msg
         })
     }
+    const { newPassword, oldPassword } = req.body;
+    const id = req.user._id;
+    User.findOne({ _id: id }, (err, user) => {
+        if (err) {
+            return res.json(failAction('User not found.'))
+        }
+        User.findOneAndUpdate(
+            { _id: id },
+            { $set: { encryPassword: user.securePassword(newPassword) } },
+            (err, user) => {
+                console.log(user);
+                if (err) {
+                    return res.status(400).json(failAction('Failed'))
+                }
+                let { _id, email, name, role } = user;
+                return res.json(successAction({
+                    user: { _id, email, name, role, isVerified: true }
+                }))
+            }
+        )
+    })
+}
+
+exports.otpVerification = (req, res) => {
+    let otp = generateRandom(5, false)
+    let email = req.body.email;
+
+    User.findOne({ email }, (err, user) => {
+        if (err) {
+            return res.json(failAction('User not found.'))
+        }
+        User.findOneAndUpdate(
+            { _id: user._id },
+            { $set: { otpCode: otp } },
+            (err, user) => {
+                if (err) {
+                    return res.status(400).json(failAction('Failed'))
+                }
+                res.json(successAction('', 'Verification OTP is sent to your Email'))
+                mailFn({
+                    to: req.body.email,
+                    subject: "Password Reset OTP",
+                    html: `<h1>Thanks for REgistration ${user.name}</h1>
+                        <p> Your One time OTP is ${otp}</p>
+                    `
+                })
+            }
+        )
+    })
+}
+
+exports.resetPassword = (req, res) => {
+    let { email, otp } = req.body;
+    let newPassword = generateRandom(8)
+    User.findOne({ email }, (err, user) => {
+        if (err) {
+            return res.json(failAction('User not found.'))
+        }
+        if (user.otpCode != otp) {
+            return res.send(failAction('OTP not match'))
+        }
+        User.findOneAndUpdate(
+            { _id: user._id },
+            { $set: { encryPassword: user.securePassword(newPassword) } },
+            (err, user) => {
+                if (err) {
+                    return res.status(400).json(failAction('Failed'))
+                }
+                res.json(successAction('', 'Your new Password is sent to your Email'))
+                mailFn({
+                    to: req.body.email,
+                    subject: "Password Reset OTP",
+                    html: `<h1>Hello ${user.name}</h1>
+                        <p> Your New Password is ${newPassword},
+                            Dont forget to change it.
+                        </p>
+                    `
+                })
+            }
+        )
+    })
+}
+
+exports.verify = async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(422).json({
+            error: errors.array()[0].msg
+        })
+    }
 
     const { vf, id } = req.body;
-    // User.findOne({ _id: id }, (err, user) => {
+    User.findOne({ _id: id }, (err, user) => {
 
-    //     if (err) {
-    //         return res.json(failAction('User not found.'))
-    //     }
-
-    //     if (user.isVerified) {
-    //         return res.json(successAction('User already Verified.'))
-    //     }
-
-    //     if (user.verificationCode == vf) {
-    User.findByIdAndUpdate(
-        { _id: id, verificationCode: vf },
-        { $set: { isVerified: true } },
-        (err, user) => {
-            if (err) {
-                return res.status(400).json(failAction('Verification Failed'))
-            }
-            let { _id, email, name, role } = user;
-            return res.json(successAction({
-                user: { _id, email, name, role, isVerified: true }
-            }))
+        if (err) {
+            return res.json(failAction('User not found.'))
         }
-    )
-    // }
-    //     else {
-    //         return res.json(failAction('Verification Faild'))
-    //     }
 
-    // })
+        if (user.isVerified) {
+            return res.json(successAction('User already Verified.'))
+        }
+
+        if (user.verificationCode == vf) {
+            User.findByIdAndUpdate(
+                { _id: id, verificationCode: vf },
+                { $set: { isVerified: true } },
+                (err, user) => {
+                    if (err) {
+                        return res.status(400).json(failAction('Verification Failed'))
+                    }
+                    let { _id, email, name, role } = user;
+                    return res.json(successAction({
+                        user: { _id, email, name, role, isVerified: true }
+                    }))
+                }
+            )
+        }
+        else {
+            return res.json(failAction('Verification Faild'))
+        }
+
+    })
 }
 
 exports.signOut = (req, res) => {
