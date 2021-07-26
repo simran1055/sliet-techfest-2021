@@ -54,11 +54,14 @@ exports.createWorkshop = (req, res) => {
             workshopDescription,
             studentCoordinator,
             hostName,
-            hostDescription
+            hostDescription,
+            startDate,
+            endDate,
+            whatsappGroupLink
         } = fields;
 
         if (!workshopName || !workshopDescription || !studentCoordinator || !hostName ||
-            !hostDescription) {
+            !hostDescription || !startDate || !endDate || !whatsappGroupLink) {
             // fs.unlinkSync(newPath);
             return res.status(400).json({
                 error: "Please include all the fields"
@@ -78,9 +81,13 @@ exports.createWorkshop = (req, res) => {
             hostName,
             hostDescription,
             studentCoordinator: studentCoordinatorArray,
+            startDate,
+            endDate,
+            whatsappGroupLink
             // facultyCoordinator: facultyCoordinatorArray,
         });
 
+        console.log(workshop1)
 
         if (file.photo) {
 
@@ -101,9 +108,9 @@ exports.createWorkshop = (req, res) => {
             var newPath1 = fur;
             var newPath = 'upload/' + newPath1
 
-
+            workshop1.photo = newPath1;
         }
-        workshop1.photo = newPath1;
+
         workshop1.save((err, workshop1) => {
             if (err) {
 
@@ -177,7 +184,10 @@ exports.updateWorkshop = (req, res) => {
             studentCoordinator,
             // facultyCoordinator,
             hostName,
-            hostDescription
+            hostDescription,
+            startDate,
+            endDate,
+            whatsappGroupLink
         } = fields;
 
 

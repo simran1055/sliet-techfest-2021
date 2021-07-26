@@ -25,6 +25,21 @@ const workshopSchema = new mongoose.Schema({
         required: true,
         maxlength: 200
     },
+    startDate: {
+        type: Date,
+
+    },
+    endDate: {
+        type: Date,
+
+    },
+    whatsappGroupLink: {
+        type: String,
+        trim: true,
+        required: true,
+
+    },
+
     // workshopSessions: [{ type: ObjectId, ref: 'WorkshopSession' }],
     studentCoordinator: [{ type: ObjectId, ref: 'Coordinator' }],
     // facultyCoordinator: [{ type: ObjectId, ref: 'Coordinator' }],
