@@ -1,12 +1,13 @@
 
 var crypto = require('crypto');
+// TODO add Stripe key
+const stripe = require('stripe')("sk_test_51ILhyyK2faB59yIQvGfqF2WwmNNjgh8EnKlpe5XrhsEuOaujLeABgt5p4VBCcXJso4s35aK3j4NMMMQDWWEduEYT00DicJ00h0")
+const uuid = require('uuid');
+
 const request = require('request');
 const { successAction, failAction } = require('../utills/response')
 
 exports.getPaymentHashId = (req, res, next) => {
-
-
-
     var cryp = crypto.createHash('sha512');
     var txnid = Date.now();
     var text = process.env.MERCHANT_KEY + '|' + txnid + '|' + process.env.ENTRY_FEE + '|' + process.env.PAYMENT_PRODUCT_INFO + '|' + req.profile.name
@@ -18,9 +19,6 @@ exports.getPaymentHashId = (req, res, next) => {
     // console.log(hash)
     next();
 }
-
-
-
 
 exports.processPayment = (req, res) => {
     var hash = req.paymentProfile.hash
@@ -102,3 +100,25 @@ exports.processPayment = (req, res) => {
 }
 
 
+
+exports.stripePayment = (req, res) => {
+    const { product, token } = req.body;
+    console.log("payment", product);
+    const idempontencyKey = uuid.v4();
+
+    return stripe.customers.create({
+        email: token.email,
+        source: token.id1
+    }).then(customer => {
+        stripe.charges.create({
+            amount: product.price * 100,
+            currency: 'INR',
+            customer: customer.id,
+            receipt_email: token.email,
+            description: "Event"
+        }, { idempontencyKey })
+    }).then(result => {
+        res.status(200).json(result)
+    })
+        .catch(err => console.log(err))
+}
