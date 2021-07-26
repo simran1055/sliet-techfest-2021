@@ -1,6 +1,7 @@
 const express = require('express');
 const { check } = require("express-validator")
-const { signIn, signUp, signOut, verify } = require('../controllers/auth.js');
+const { signIn, signUp, signOut, verify, changePassword, resetPassword, otpVerification } = require('../controllers/auth.js');
+const { isAuthenticated, isSignedIn, isAdmin, isAuthenticatedFn, isVerifiedCheck, hasPaidEntryCheck, isProfileCompleteCheck } = require("../controllers/auth");
 
 var router = express.Router()
 
@@ -24,6 +25,11 @@ router.post("/signin", [
 ], signIn);
 
 router.post("/verify", verify);
+router.post("/change-password", isSignedIn, isAuthenticatedFn, changePassword);
+router.post("/reset-password", resetPassword);
+router.post("/send-otp", otpVerification);
+
+
 
 router.get("/signout", signOut);
 
