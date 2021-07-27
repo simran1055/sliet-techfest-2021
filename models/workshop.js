@@ -36,8 +36,6 @@ const workshopSchema = new mongoose.Schema({
     whatsappGroupLink: {
         type: String,
         trim: true,
-        required: true,
-
     },
 
     // workshopSessions: [{ type: ObjectId, ref: 'WorkshopSession' }],
