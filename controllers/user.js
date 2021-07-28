@@ -26,6 +26,25 @@ exports.getUserById = (req, res, next, id) => {
     })
 }
 
+exports.getUserId = (req, res) => {
+    let { email } = req.body
+    User.findOne(
+        { email },
+        { userId: 1, _id: 0, name: 1, isVerified: 1, isProfileComplete: 1, hasPaidEntry: 1 }, (err, user) => {
+            if (!user || err) {
+                return res.send(failAction('User Not Found'))
+            }
+            if (user.isVerified) {
+                return res.send(failAction('User Is Not Verified'))
+            } if (!user.isProfileComplete) {
+                return res.send(failAction('User Profile Is Not Complete'))
+            } if (!user.hasPaidEntry) {
+                return res.send(failAction('User has not paid entry fee'))
+            }
+            res.send(user)
+        }
+    )
+}
 
 exports.getUser = (req, res) => {
     req.profile.salt = undefined

@@ -1,6 +1,6 @@
 const express = require('express');;
 var router = express.Router();
-const { getUserById, getUser, updateUser, notify, campusAmbassador, campusAmbassadorListAdmin, campusAmbassadorList, updateTeam, createTeam, removeTeamMember, acceptTeamLink, testMessage, enrollUserinWorkshop, enrollUserinEvent } = require("../controllers/user")
+const { getUserId, getUser, updateUser, notify, campusAmbassador, campusAmbassadorListAdmin, campusAmbassadorList, updateTeam, createTeam, removeTeamMember, acceptTeamLink, testMessage, enrollUserinWorkshop, enrollUserinEvent } = require("../controllers/user")
 const { isAuthenticated, isSignedIn, isAdmin, isAuthenticatedFn, isVerifiedCheck, hasPaidEntryCheck, isProfileCompleteCheck } = require("../controllers/auth");
 const { getWorkshopById } = require('../controllers/workshop');
 const { getEventById } = require('../controllers/event');
@@ -17,7 +17,7 @@ router.post('/user/remove-team-member', isSignedIn, isAuthenticatedFn, removeTea
 router.post('/user/update-team', isSignedIn, isAuthenticatedFn, updateTeam)
 
 // Users Route
-router.param('userId', getUserById);
+router.param('userId', getUserId);
 // router.get('/user/:userId', isSignedIn, isAuthenticated, isVerified, getUser);
 // router.get('/user/:userId', isSignedIn, isAuthenticated, getUser);
 router.get('/user/:userId', getUser);
@@ -27,7 +27,7 @@ router.put('/user/:userId', isSignedIn, isAuthenticated, updateUser);
 // Notification Routes
 router.post('/user/notify', notify)
 router.post('/user/test-message', testMessage)
-
+router.post('/user/get-id', isSignedIn, isAuthenticatedFn, getUserId)
 
 //////////// workshop related
 
