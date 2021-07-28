@@ -34,7 +34,7 @@ exports.getUserId = (req, res) => {
             if (!user || err) {
                 return res.send(failAction('User Not Found'))
             }
-            if (user.isVerified) {
+            if (!user.isVerified) {
                 return res.send(failAction('User Is Not Verified'))
             } if (!user.isProfileComplete) {
                 return res.send(failAction('User Profile Is Not Complete'))
