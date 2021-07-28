@@ -243,11 +243,11 @@ exports.verify = async (req, res) => {
             return res.json(failAction('User not found.'))
         }
 
-        if (user.isVerified) {
+        if (user?.isVerified) {
             return res.json(successAction('User already Verified.'))
         }
 
-        if (user.verificationCode == vf) {
+        if (user?.verificationCode == vf) {
             User.findByIdAndUpdate(
                 { _id: id, verificationCode: vf },
                 { $set: { isVerified: true } },
@@ -287,7 +287,6 @@ exports.isSignedIn = expressJwt({
 
 exports.isAuthenticated = (req, res, next) => {
     let checker = req.profile && req.auth && req.auth._id == req.profile._id;
-    console.log(req.auth)
     if (!checker) {
         return res.status(403).json({
             error: "Access Denied , Not authenticated"

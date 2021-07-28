@@ -464,8 +464,8 @@ exports.enrollUserinWorkshop = (req, res) => {
 
 exports.enrollUserinEvent = (req, res) => {
     let events = [req.event1._id];
-    // console.log(req.profile.workshopsEnrolled)
-    // console.log(req.workshop1._id)
+    // console.log(req.profile)
+    // console.log(req.workshop1)
     var flag = 0
     req.profile.eventRegIn.find(ele => {
         if (ele.equals(req.event1._id)) {
@@ -490,7 +490,7 @@ exports.enrollUserinEvent = (req, res) => {
         (err, user) => {
             if (err || !user) {
                 return res.status(400).json({
-                    error: "Unable to enroll in workshop"
+                    error: "Unable to enroll in Event"
                 });
             }
             user.salt = undefined;
