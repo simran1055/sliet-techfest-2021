@@ -239,15 +239,15 @@ exports.verify = async (req, res) => {
     const { vf, id } = req.body;
     User.findOne({ _id: id }, (err, user) => {
 
-        if (err) {
+        if (!user || err) {
             return res.json(failAction('User not found.'))
         }
 
-        if (user?.isVerified) {
+        if (user.isVerified) {
             return res.json(successAction('User already Verified.'))
         }
 
-        if (user?.verificationCode == vf) {
+        if (user.verificationCode == vf) {
             User.findByIdAndUpdate(
                 { _id: id, verificationCode: vf },
                 { $set: { isVerified: true } },
