@@ -36,7 +36,8 @@ exports.getUserId = (req, res) => {
             let inEvent = user.eventRegIn.find(x => x == req.body.eventRegIn)
             if (inEvent) {
                 return res.send(failAction('User Already registerd in Event'))
-            } if (!user.isVerified) {
+            }
+            if (!user.isVerified) {
                 return res.send(failAction('User Is Not Verified'))
             } if (!user.isProfileComplete) {
                 return res.send(failAction('User Profile Is Not Complete'))
