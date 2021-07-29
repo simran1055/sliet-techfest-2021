@@ -1,6 +1,6 @@
 const express = require('express');;
 var router = express.Router();
-const { getUserId, getUser, updateUser, notify, campusAmbassador, campusAmbassadorListAdmin, campusAmbassadorList, updateTeam, createTeam, removeTeamMember, acceptTeamLink, testMessage, enrollUserinWorkshop, enrollUserinEvent } = require("../controllers/user")
+const { getUserId, getUserById, getUser, updateUser, notify, campusAmbassador, campusAmbassadorListAdmin, campusAmbassadorList, updateTeam, createTeam, removeTeamMember, acceptTeamLink, testMessage, enrollUserinWorkshop, enrollUserinEvent } = require("../controllers/user")
 const { isAuthenticated, isSignedIn, isAdmin, isAuthenticatedFn, isVerifiedCheck, hasPaidEntryCheck, isProfileCompleteCheck } = require("../controllers/auth");
 const { getWorkshopById } = require('../controllers/workshop');
 const { getEventById } = require('../controllers/event');
@@ -17,7 +17,7 @@ router.post('/user/remove-team-member', isSignedIn, isAuthenticatedFn, removeTea
 router.post('/user/update-team', isSignedIn, isAuthenticatedFn, updateTeam)
 
 // Users Route
-router.param('userId', getUserId);
+router.param('userId', getUserById);
 // router.get('/user/:userId', isSignedIn, isAuthenticated, isVerified, getUser);
 // router.get('/user/:userId', isSignedIn, isAuthenticated, getUser);
 router.get('/user/:userId', getUser);
