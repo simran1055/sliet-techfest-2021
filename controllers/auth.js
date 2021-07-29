@@ -148,8 +148,11 @@ exports.changePassword = (req, res) => {
     const { newPassword, oldPassword } = req.body;
     const id = req.user._id;
     User.findOne({ _id: id }, (err, user) => {
-        if (err) {
+        if (!user || err) {
             return res.json(failAction('User not found.'))
+        }
+        if (user.securePassword(oldPassword) != user.encryPassword) {
+            return res.send(failAction('Password is incorrect'));
         }
         User.findOneAndUpdate(
             { _id: id },
