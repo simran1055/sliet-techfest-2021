@@ -183,6 +183,9 @@ exports.otpVerification = (req, res) => {
                 if (err) {
                     return res.status(400).json(failAction('Failed'))
                 }
+                if (!user) {
+                    return res.status(400).json(failAction('User not found'))
+                }
                 res.json(successAction('', 'Verification OTP is sent to your Email'))
                 mailFn({
                     to: req.body.email,
@@ -212,6 +215,9 @@ exports.resetPassword = (req, res) => {
             (err, user) => {
                 if (err) {
                     return res.status(400).json(failAction('Failed'))
+                }
+                if (!user) {
+                    return res.status(400).json(failAction('User not found'))
                 }
                 res.json(successAction('', 'Your new Password is sent to your Email'))
                 mailFn({
