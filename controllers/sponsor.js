@@ -25,7 +25,7 @@ exports.addSponsor = async (req, res) => {
 
     const sponsor = new Sponsors(payload);
     sponsor.save((err, sponsor) => {
-        if (err) {
+        if (!sponsor || err) {
             console.log(err);
             return res.status(400).json(
                 failAction("Not able to Sign Up. Some error ocuured")

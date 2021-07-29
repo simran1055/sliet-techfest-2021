@@ -5,6 +5,7 @@ const User = require("../models/user");
 const { mailFn } = require("../utills/mail");
 const { successAction, failAction } = require("../utills/response")
 const message = require("../utills/messages")
+var ejs = require("ejs");
 
 var jwt = require('jsonwebtoken');
 var expressJwt = require('express-jwt');
@@ -66,13 +67,22 @@ exports.signUp = async (req, res) => {
             )
         }
 
-        mailFn({
-            to: req.body.email,
-            subject: message.verificaton,
-            html: `<h1>Thanks for REgistration ${user.name}</h1>
-                <p> <a href="https://dev.techfestsliet.com/signin?vf=${user.verificationCode}&id=${user.id}"> Please Click here to verify </a></p>
-            `
+        ejs.renderFile("public/verification.ejs", { payload: { name: user.name, verificationCode: user.verificationCode, id: user.id } }, function (err, data) {
+            mailFn({
+                to: req.body.email,
+                subject: "Verification Email | | techFEST'21",
+                html: data
+            })
         })
+
+
+        // mailFn({
+        //     to: req.body.email,
+        //     subject: "Verification Email | | techFEST'21",
+        //     html: `<h1>Thanks for REgistration ${user.name}</h1>
+        //         <p> <a href="https://dev.techfestsliet.com/signin?vf=${user.verificationCode}&id=${user.id}"> Please Click here to verify </a></p>
+        //     `
+        // })
 
         res.status(200).json(
             successAction({
@@ -176,7 +186,7 @@ exports.otpVerification = (req, res) => {
     let email = req.body.email;
 
     User.findOne({ email }, (err, user) => {
-        if (err) {
+        if (!user || err) {
             return res.json(failAction('User not found.'))
         }
         User.findOneAndUpdate(
@@ -190,13 +200,22 @@ exports.otpVerification = (req, res) => {
                     return res.status(400).json(failAction('User not found'))
                 }
                 res.json(successAction('', 'Verification OTP is sent to your Email'))
-                mailFn({
-                    to: req.body.email,
-                    subject: "Password Reset OTP",
-                    html: `<h1>Thanks for REgistration ${user.name}</h1>
-                        <p> Your One time OTP is ${otp}</p>
-                    `
+
+                ejs.renderFile("public/otp.ejs", { payload: { name: user.name, otp: otp } }, function (err, data) {
+                    mailFn({
+                        to: req.body.email,
+                        subject: "OTP for password reset | | techFEST'21",
+                        html: data
+                    })
                 })
+
+                // mailFn({
+                //     to: req.body.email,
+                //     subject: "Password Reset OTP",
+                //     html: `<h1>Thanks for REgistration ${user.name}</h1>
+                //         <p> Your One time OTP is ${otp}</p>
+                //     `
+                // })
             }
         )
     })
@@ -206,7 +225,7 @@ exports.resetPassword = (req, res) => {
     let { email, otp } = req.body;
     let newPassword = generateRandom(8)
     User.findOne({ email }, (err, user) => {
-        if (err) {
+        if (!user || err) {
             return res.json(failAction('User not found.'))
         }
         if (user.otpCode != otp) {
@@ -223,15 +242,24 @@ exports.resetPassword = (req, res) => {
                     return res.status(400).json(failAction('User not found'))
                 }
                 res.json(successAction('', 'Your new Password is sent to your Email'))
-                mailFn({
-                    to: req.body.email,
-                    subject: "Password Reset OTP",
-                    html: `<h1>Hello ${user.name}</h1>
-                        <p> Your New Password is ${newPassword},
-                            Dont forget to change it.
-                        </p>
-                    `
+
+                ejs.renderFile("public/newPassword.ejs", { payload: { name: user.name, newPassword: newPassword } }, function (err, data) {
+                    mailFn({
+                        to: req.body.email,
+                        subject: "New password for account | | techFEST'21",
+                        html: data
+                    })
                 })
+
+                // mailFn({
+                //     to: req.body.email,
+                //     subject: "New password for account | | techFEST'21",
+                //     html: `<h1>Hello ${user.name}</h1>
+                //         <p> Your New Password is ${newPassword},
+                //             Dont forget to change it.
+                //         </p>
+                //     `
+                // })
             }
         )
     })
@@ -261,7 +289,7 @@ exports.verify = async (req, res) => {
                 { _id: id, verificationCode: vf },
                 { $set: { isVerified: true } },
                 (err, user) => {
-                    if (err) {
+                    if (!user || err) {
                         return res.status(400).json(failAction('Verification Failed'))
                     }
                     let { _id, email, name, role } = user;
