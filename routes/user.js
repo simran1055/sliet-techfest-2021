@@ -33,7 +33,7 @@ router.post('/user/get-id', isSignedIn, isAuthenticatedFn, getUserId)
 
 router.param('workshopId', getWorkshopById);
 
-router.post('/user/:userId/workshop/:workshopId', isSignedIn, isAuthenticated, isVerifiedCheck, hasPaidEntryCheck, isProfileCompleteCheck, enrollUserinWorkshop)
+router.post('/user/:userId/workshop/:workshopId', isSignedIn, isAuthenticated, isVerifiedCheck, isProfileCompleteCheck, enrollUserinWorkshop)
 
 //////////// workshop related
 

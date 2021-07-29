@@ -152,7 +152,7 @@ exports.changePassword = (req, res) => {
             return res.json(failAction('User not found.'))
         }
         if (user.securePassword(oldPassword) != user.encryPassword) {
-            return res.send(failAction('Password is incorrect'));
+            return res.status(400).send(failAction('Password is incorrect'));
         }
         User.findOneAndUpdate(
             { _id: id },
