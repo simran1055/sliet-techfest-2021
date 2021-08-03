@@ -1,7 +1,7 @@
 
 var crypto = require('crypto');
 // TODO add Stripe key
-const stripe = require('stripe')("sk_test_51ILhyyK2faB59yIQvGfqF2WwmNNjgh8EnKlpe5XrhsEuOaujLeABgt5p4VBCcXJso4s35aK3j4NMMMQDWWEduEYT00DicJ00h0")
+const stripe = require('stripe')("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")
 const uuid = require('uuid');
 
 const request = require('request');
@@ -102,23 +102,61 @@ exports.processPayment = (req, res) => {
 
 
 exports.stripePayment = (req, res) => {
-    const { product, token } = req.body;
-    console.log("payment", product);
-    const idempontencyKey = uuid.v4();
 
-    return stripe.customers.create({
-        email: token.email,
-        source: token.id1
-    }).then(customer => {
-        stripe.charges.create({
-            amount: product.price * 100,
-            currency: 'INR',
-            customer: customer.id,
-            receipt_email: token.email,
-            description: "Event"
-        }, { idempontencyKey })
-    }).then(result => {
-        res.status(200).json(result)
+
+    const { product, token } = req.body;
+    console.log("PRODUCT ", product);
+    console.log("PRICE ", product.price);
+    const idempotencyKey = uuid.v4();
+
+    stripe.customers.create({
+        email:  token.email,
+        source: token.id,
+        name: 'Gourav Hammad',
+        address: {
+            line1: 'TC 9/4 Old MES colony',
+            postal_code: '452331',
+            city: 'Indore',
+            state: 'Madhya Pradesh',
+            country: 'India',
+        }
     })
-        .catch(err => console.log(err))
+    .then((customer) => {
+  
+        return stripe.charges.create({
+            amount: 2500,     // Charing Rs 25
+            description: 'Web Development Product',
+            currency: 'INR',
+            customer: customer.id
+        });
+    })
+    .then((charge) => {
+        console.log(charge);
+        res.send("Success")  // If no error occurs
+    })
+    .catch((err) => {
+        res.send(err)       // If some error occurs
+    });
+
+    // const { product, token } = req.body;
+    // console.log("payment", product);
+    // const idempontencyKey = uuid.v4();
+
+    // return stripe.customers.create({
+    //     email: token.email,
+    //     source: token.id
+    // }).then(customer => {
+    //     console.log('<<<',customer);
+    //     stripe.charges.create({
+    //         amount: product.price * 100,
+    //         currency: 'INR',
+    //         customer: customer.id,
+    //         receipt_email: token.email,
+    //         description: "Event"
+    //     }, { idempontencyKey })
+    // }).then(result => {
+    //     console.log('>>>',result);
+    //     res.status(200).json(result)
+    // })
+    //     .catch(err => console.log(err))
 }
