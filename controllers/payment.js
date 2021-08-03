@@ -1,7 +1,7 @@
 
 var crypto = require('crypto');
 // TODO add Stripe key
-const stripe = require('stripe')("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")
+const stripe = require('stripe')(process.env.PAYMENT_KEY)
 const uuid = require('uuid');
 
 const request = require('request');
@@ -124,7 +124,7 @@ exports.stripePayment = (req, res) => {
     .then((customer) => {
   
         return stripe.charges.create({
-            amount: 2500,     // Charing Rs 25
+            amount: 500,     // Charing Rs 25
             description: 'Web Development Product',
             currency: 'INR',
             customer: customer.id
