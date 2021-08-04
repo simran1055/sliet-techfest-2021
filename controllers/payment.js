@@ -1,10 +1,10 @@
 
 var crypto = require('crypto');
-// TODO add Stripe key
-const stripe = require('stripe')(process.env.PAYMENT_KEY)
 const uuid = require('uuid');
-
 const request = require('request');
+const stripe = require('stripe')(process.env.PAYMENT_KEY)
+
+const User = require("../models/user");
 const { successAction, failAction } = require('../utills/response')
 
 exports.getPaymentHashId = (req, res, next) => {
@@ -101,42 +101,57 @@ exports.processPayment = (req, res) => {
 
 
 
-exports.stripePayment = (req, res) => {
+exports.stripePayment = async (req, res) => {
+    // console.log('hello');
+    // const session = await stripe.checkout.sessions.create({
+    //     payment_method_types: [
+    //         'card',
+    //     ],
+    //     line_items: [
+    //         {
+    //             // TODO: replace this with the `price` of the product you want to sell
+    //             price: `price_1JKQG4K2faB59yIQH6Sd90xC`,
+    //             quantity: 1,
+    //         },
+    //     ],
+    //     mode: 'payment',
+    //     success_url: `https://api.techfestsliet.com/success.html`,
+    //     cancel_url: `https://api.techfestsliet.com/cancel.html`,
 
+    // })
+    // const { product, token } = req.body;
+    // console.log("PRODUCT ", product);
+    // console.log("PRICE ", product.price);
+    // const idempotencyKey = uuid.v4();
 
-    const { product, token } = req.body;
-    console.log("PRODUCT ", product);
-    console.log("PRICE ", product.price);
-    const idempotencyKey = uuid.v4();
+    // stripe.customers.create({
+    //     email:  token.email,
+    //     source: token.id,
+    //     name: 'Gourav Hammad',
+    //     address: {
+    //         line1: 'TC 9/4 Old MES colony',
+    //         postal_code: '452331',
+    //         city: 'Indore',
+    //         state: 'Madhya Pradesh',
+    //         country: 'India',
+    //     }
+    // })
+    // .then((customer) => {
 
-    stripe.customers.create({
-        email:  token.email,
-        source: token.id,
-        name: 'Gourav Hammad',
-        address: {
-            line1: 'TC 9/4 Old MES colony',
-            postal_code: '452331',
-            city: 'Indore',
-            state: 'Madhya Pradesh',
-            country: 'India',
-        }
-    })
-    .then((customer) => {
-  
-        return stripe.charges.create({
-            amount: 500,     // Charing Rs 25
-            description: 'Web Development Product',
-            currency: 'INR',
-            customer: customer.id
-        });
-    })
-    .then((charge) => {
-        console.log(charge);
-        res.send("Success")  // If no error occurs
-    })
-    .catch((err) => {
-        res.send(err)       // If some error occurs
-    });
+    //     return stripe.charges.create({
+    //         amount: 500,     // Charing Rs 25
+    //         description: 'Web Development Product',
+    //         currency: 'INR',
+    //         customer: customer.id
+    //     });
+    // })
+    // .then((charge) => {
+    //     console.log(charge);
+    //     res.send("Success")  // If no error occurs
+    // })
+    // .catch((err) => {
+    //     res.send(err)       // If some error occurs
+    // });
 
     // const { product, token } = req.body;
     // console.log("payment", product);
@@ -159,4 +174,92 @@ exports.stripePayment = (req, res) => {
     //     res.status(200).json(result)
     // })
     //     .catch(err => console.log(err))
+}
+
+
+
+exports.payStripeLast = async (req, res) => {
+    console.log(req.body.id)
+    const session = await stripe.checkout.sessions.create({
+        payment_method_types: [
+            'card'
+        ],
+        line_items: [
+            {
+                // TODO: replace this with the `price` of the product you want to sell
+                price: 'price_1JKQG4K2faB59yIQH6Sd90xC',
+                quantity: 1,
+            },
+        ],
+        mode: 'payment',
+        success_url: `https://api.techfestsliet.com/api/success/?id=${req.body.id}`,
+        cancel_url: `https://api.techfestsliet.com/api/cancel/?id=${req.body.id}`,
+    });
+    // console.log(session.url)
+    let checkIfAlreadyPaid = await User.findByIdAndUpdate({ _id: req.body.id }, { paymentId: session.id })
+
+    res.redirect(303, session.url)
+
+}
+
+exports.paymentSuccessAction = async (req, res) => {
+    const getPaymentId = await User.findById({ _id: req.query.id })
+    const checkIfPaid = await stripe.checkout.sessions.retrieve(getPaymentId.paymentId)
+    if (!checkIfPaid) {
+        return res.send('Some Error Accured');
+    }
+    if (checkIfPaid.payment_status != 'unpaid') {
+        User.findByIdAndUpdate(
+            {
+                _id: req.query.id
+            },
+            {
+                $set: { hasPaidEntry: true }
+            },
+            {
+                new: true,
+                useFindAndModify: false
+            },
+            (err, user) => {
+                if (err) {
+                    console.log(err);
+                    return res.status(400).json({
+                        error: "You are not authorized to update this user"
+                    })
+                }
+                res.render('payment');
+            })
+    }
+}
+
+exports.cancelAction = async (req, res) => {
+    const getPaymentId = await User.findById({ _id: req.query.id })
+    const checkIfPaid = await await stripe.checkout.sessions.retrieve(getPaymentId.paymentId)
+    if (!checkIfPaid) {
+        return res.send('Some Error Accured');
+    }
+    if (checkIfPaid.payment_status == 'unpaid') {
+        User.findByIdAndUpdate(
+            {
+                id: req.query.id
+            },
+            {
+                $set: {
+                    hasPaidEntry: false,
+                    paymentId: ''
+                }
+            },
+            {
+                new: true,
+                useFindAndModify: false
+            },
+            (err, user) => {
+                if (err) {
+                    return res.status(400).json({
+                        error: "You are not authorized to update this user"
+                    })
+                }
+                res.status(400).send(failAction('Payment declined'))
+            })
+    }
 }

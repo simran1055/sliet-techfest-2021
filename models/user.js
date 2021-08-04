@@ -104,6 +104,7 @@ const userSchema = new mongoose.Schema({
         type: Boolean,
         default: 0
     },
+    paymentId: String,
     eventRegIn: [{ type: ObjectId, ref: 'Events' }],
     workshopsEnrolled: [{ type: ObjectId, ref: 'Workshop' }],
     campusAmbassador: {

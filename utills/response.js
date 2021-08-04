@@ -1,4 +1,4 @@
-exports.successAction = (data, message = 'OK') => {
+exports.successAction = (data, message = 'Success') => {
     return ({ statusCode: 200, data, message });
 }
 
