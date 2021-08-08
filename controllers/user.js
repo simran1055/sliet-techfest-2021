@@ -34,7 +34,10 @@ exports.getUserId = (req, res) => {
             if (!user || err) {
                 return res.send(failAction('User Not Found'))
             }
-            let inEvent = user.eventRegIn.find(x => x == req.body.eventRegIn)
+            // console.log('>>> event Id ', req.body.eventId);
+            // console.log('>>>> eventRegIn ', user.eventRegIn);
+            let inEvent = user.eventRegIn.find(x => x == req.body.eventId)
+
             if (inEvent) {
                 return res.send(failAction('User Already registerd in Event'))
             }
@@ -202,7 +205,6 @@ exports.campusAmbassadorList = async (req, res) => {
 
 
 exports.createTeam = async (req, res) => {
-    console.log(req.profile);
     let {
         totalTeamMember,
         teamMembers,
@@ -226,9 +228,7 @@ exports.createTeam = async (req, res) => {
     if (!leaderData) {
         return res.send(failAction('User Not Found'))
     }
-    console.log(leaderData);
     let inEvent = leaderData.eventRegIn.find(x => x == eventId)
-    console.log(inEvent);
     if (inEvent) {
         return res.send(failAction('You are already registerd in Event'))
     }
@@ -236,24 +236,37 @@ exports.createTeam = async (req, res) => {
     let allUser = await User.find({ userId: { $in: teamMembers } })
     let getId = [];
     let email = [];
-
+    let alreadyReg = false;
     allUser.forEach(element => {
         let inEvent = element.eventRegIn.find(x => x == eventId)
         if (inEvent) {
+            alreadyReg = true;
             return res.send(failAction(`${element.name} is already registerd in Event`))
         }
         let uuIdCode = uuidv4.v4()
-        getId.push({
+        let x = {
             userId: element._id,
-            inviteCode: uuIdCode
-        })
-        email.push({
-            email: element.email,
-            name: element.name,
-            confirm_link: "https://techfestsliet.com/?id=" + element._id + "&code=" + uuIdCode + "&event=" + eventId
-        })
+            inviteCode: uuIdCode,
+        }
+        if (leaderData._id.toString() == element._id.toString()) {
+            x = {
+                ...x, ...{ isAccepted: true }
+            }
+        }
+        getId.push(x)
+
+        if (leaderData._id.toString() != element._id.toString()) {
+            email.push({
+                email: element.email,
+                name: element.name,
+                confirm_link: "https://techfestsliet.com/?id=" + element._id + "&code=" + uuIdCode + "&event=" + eventId
+            })
+        }
     });
 
+    if (alreadyReg) {
+        return
+    }
     let payload = req.body;
     delete payload["usersId"]
     payload = {
@@ -267,7 +280,7 @@ exports.createTeam = async (req, res) => {
 
     team.save((err, team) => {
         if (err) {
-            console.log(err);
+            // console.log(err);
             return res.status(400).json(
                 failAction("Some error ocuured")
             )
@@ -371,6 +384,7 @@ exports.acceptTeamLink = async (req, res) => {
     const { code, id, eventId } = req.body;
 
     let checkUser = await Team.findOne({ eventId, "usersId.userId": id, "usersId.inviteCode": code })
+    // return;
     if (!checkUser) {
         return res.send(failAction('User Not Found'))
     }
