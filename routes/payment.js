@@ -22,4 +22,5 @@ router.use('/payment', stripePayment)
 router.post('/create-checkout-session', payStripeLast);
 
 router.get('/success', paymentSuccessAction)
+router.get('/ca', paymentSuccessAction)
 module.exports = router;

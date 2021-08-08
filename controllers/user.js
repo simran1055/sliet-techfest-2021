@@ -30,6 +30,7 @@ exports.getUserId = (req, res) => {
     User.findOne(
         { email: req.body.email },
         { userId: 1, _id: 0, name: 1, isVerified: 1, isProfileComplete: 1, hasPaidEntry: 1, eventRegIn: 1 }, (err, user) => {
+            // console.log(user);
             if (!user || err) {
                 return res.send(failAction('User Not Found'))
             }
@@ -384,11 +385,9 @@ exports.acceptTeamLink = async (req, res) => {
             if (!user || err) {
                 return res.status(400).json(failAction('Something went wrong'))
             }
-            return res.json(successAction(user, 'verify Success'))
+            return res.json(successAction('', 'verify Success'))
         }
     )
-
-
 }
 
 // Remove Team Member

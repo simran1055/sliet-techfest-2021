@@ -281,7 +281,7 @@ exports.verify = async (req, res) => {
         }
 
         if (user.isVerified) {
-            return res.json(successAction('User already Verified.'))
+            return res.json(successAction('','User already Verified.'))
         }
 
         if (user.verificationCode == vf) {
@@ -295,7 +295,7 @@ exports.verify = async (req, res) => {
                     let { _id, email, name, role } = user;
                     return res.json(successAction({
                         user: { _id, email, name, role, isVerified: true }
-                    }))
+                    },'User Verified Successfully!!'))
                 }
             )
         }
