@@ -80,7 +80,7 @@ exports.signUp = async (req, res) => {
         //     to: req.body.email,
         //     subject: "Verification Email | | techFEST'21",
         //     html: `<h1>Thanks for REgistration ${user.name}</h1>
-        //         <p> <a href="https://dev.techfestsliet.com/signin?vf=${user.verificationCode}&id=${user.id}"> Please Click here to verify </a></p>
+        //         <p> <a href="https://techfestsliet.com/signin?vf=${user.verificationCode}&id=${user.id}"> Please Click here to verify </a></p>
         //     `
         // })
 

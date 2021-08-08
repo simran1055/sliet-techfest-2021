@@ -193,7 +193,7 @@ exports.payStripeLast = async (req, res) => {
         ],
         mode: 'payment',
         success_url: `https://api.techfestsliet.com/api/success/?id=${req.body.id}`,
-        cancel_url: `https://api.techfestsliet.com/api/cancel/?id=${req.body.id}`,
+        cancel_url: `https://techfestsliet.com/user/dashboard`,
     });
     // console.log(session.url)
     let checkIfAlreadyPaid = await User.findByIdAndUpdate({ _id: req.body.id }, { paymentId: session.id })
