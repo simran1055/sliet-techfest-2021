@@ -84,7 +84,7 @@ exports.updateUser = (req, res) => {
 
     if (
 
-        !lastName || !phone || !dob || !designation
+        !phone || !dob || !designation
         || !collegeName
         || !collegeAddress
         || !courseEnrolled
