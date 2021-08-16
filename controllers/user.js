@@ -19,7 +19,6 @@ exports.getUserById = (req, res, next, id) => {
                 error: "Error while fetching user"
             })
         }
-
         req.profile = user
 
         next();
@@ -60,8 +59,6 @@ exports.getUser = (req, res) => {
 }
 
 exports.updateUser = (req, res) => {
-
-
     delete req.body['email'];
     delete req.body['role'];
     delete req.body['userId'];
@@ -239,6 +236,9 @@ exports.createTeam = async (req, res) => {
     let alreadyReg = false;
     allUser.forEach(element => {
         let inEvent = element.eventRegIn.find(x => x == eventId)
+        if (alreadyReg) {
+            return
+        }
         if (inEvent) {
             alreadyReg = true;
             return res.send(failAction(`${element.name} is already registerd in Event`))
@@ -301,80 +301,24 @@ exports.createTeam = async (req, res) => {
             })
         })
     });
+}
 
-    // // let usersData = await User.find({ $or: [{ userId: { $in: teamMembers } }], eventRegIn: { $in: mongoose.Types.ObjectId(eventId) } }, { name: 1 })
-    // let usersData = await User.find({ userId: { $in: [...teamMembers, ...[teamLeader]] } })
-    // usersData.forEach(element => {
+exports.teamList = async (req, res) => {
+    const errors = validationResult(req);
 
-    //     // check if anyone in event
-    // let inEvent = element.eventRegIn.find(x => x == eventId)
-    // if (inEvent) {
-    //     alreadyInEvent.push(element.name)
-    // }
-    //     else {
-    //         if (leaderId != element._id) {
-    //             let uuIdCode = uuidv4.v4()
-    //             updateId.push(element._id)
-    //             getId.push({
-    //                 userId: element._id,
-    //                 inviteCode: uuIdCode
-    //             })
-    //             email.push({
-    //                 email: element.email,
-    //                 name: element.name,
-    //                 confirm_link: "https://techfestsliet.com/?id=" + element._id + "&code=" + uuIdCode + "&event=" + eventId
-    //             })
-    //         }
-    //     }
-    // })
-    // updateId.push(leaderId)
-
-    // if (alreadyInEvent.length) {
-    //     return res.send(failAction({ alreadyInEvent, notPaidFee }))
-    // }
-
-    // let payload = req.body;
-    // delete payload["usersId"]
-    // payload = {
-    //     ...payload, ...{
-    //         leaderId: req.user._id,
-    //         usersId: getId
-    //     }
-    // }
-
-    // const team = new Team(payload);
-
-    // team.save((err, team) => {
-    //     if (err) {
-    //         console.log(err);
-    //         return res.status(400).json(
-    //             failAction("Some error ocuured")
-    //         )
-    //     }
-    //     res.send(team);
-    // })
-
-    // let updates = await User.updateMany(
-    //     { _id: { $in: updateId } },
-    //     { $push: { eventRegIn: eventId } },
-    //     { new: true, useFindAndModify: false })
-
-
-    // email.forEach(element => {
-    //     ejs.renderFile("public/testVerification.ejs", { payload: element }, function (err, data) {
-    //         mailFn({
-    //             to: element.email,
-    //             subject: 'Invitation To Join Team',
-    //             html: data
-    //         })
-    //     })
-    // });
+    if (!errors.isEmpty()) {
+        return res.status(422).json({
+            error: errors.array()[0].msg
+        })
+    }
+    const { eventId, id } = req.body;
+    let checkUser = await Team.findOne({ eventId, "usersId.userId": id, "usersId.isAccepted": true }, { 'usersId.inviteCode': 0 }).populate('usersId.userId', { name: 1, email: 1, userId: 1, phone: 1 })
+    res.send(checkUser)
 }
 
 // Accept Team Link 
 exports.acceptTeamLink = async (req, res) => {
     const errors = validationResult(req);
-
     if (!errors.isEmpty()) {
         return res.status(422).json({
             error: errors.array()[0].msg
@@ -407,15 +351,15 @@ exports.acceptTeamLink = async (req, res) => {
 // Remove Team Member
 exports.removeTeamMember = (req, res) => {
     let { userToRemove, eventId } = req.body
-    let userRemoveBy = req.user._id
+    let userRemoveBy = userToRemove
     Team.findOne({ eventId, "usersId.userId": userToRemove }, (err, user) => {
         if (err || !user) {
             return res.send(failAction('User Not Found'))
         }
         if (userRemoveBy == user.leaderId || userRemoveBy == userToRemove) {
-            Team.findOneAndUpdate(
-                { eventId, "usersId.userId": userToRemove },
-                { $pull: { "usersId": { userId: userToRemove } } },
+            User.findOneAndUpdate(
+                { "_id": userToRemove },
+                { $pull: { "eventRegIn": eventId } },
                 { new: true, useFindAndModify: false },
                 (err, user) => {
                     if (err) {
@@ -424,7 +368,21 @@ exports.removeTeamMember = (req, res) => {
                     if (!user) {
                         return res.status(400).json(failAction('Something went wrong'))
                     }
-                    return res.json(successAction('', 'User Left the Team'))
+                    Team.findOneAndUpdate(
+                        { eventId, "usersId.userId": userToRemove },
+                        { $pull: { "usersId": { userId: userToRemove } } },
+                        { new: true, useFindAndModify: false },
+                        (err, user) => {
+                            if (err) {
+                                return res.status(400).json(failAction('Something went wrong'))
+                            }
+                            if (!user) {
+                                return res.status(400).json(failAction('Something went wrong'))
+                            }
+
+                            return res.json(successAction('', 'User Left the Team'))
+                        }
+                    )
                 }
             )
         } else {
@@ -445,76 +403,78 @@ exports.updateTeam = async (req, res) => {
         if (err || !user) {
             return res.send(failAction('User Not Found'))
         }
-
-        if (teamMembers.length && (totalTeamMember == user.totalTeamMember || totalTeamMember > user.totalTeamMember)) {
-            User.find({ userId: { $in: teamMembers } }, (err, usersData) => {
-                usersData.forEach(element => {
-
-                    // check if anyone in event
-                    let inEvent = element.eventRegIn.find(x => x == eventId)
-                    if (inEvent) {
-                        alreadyInEvent.push(element.name)
-                    }
-                    else {
-
-                        let uuIdCode = uuidv4.v4()
-                        updateId.push(element._id)
-                        getId.push({
-                            userId: element._id,
-                            inviteCode: uuIdCode
-                        })
-                        email.push({
-                            email: element.email,
-                            name: element.name,
-                            confirm_link: "https://techfestsliet.com/?id=" + element._id + "&code=" + uuIdCode + "&event=" + eventId
-                        })
-
-                    }
+        // if ((teamMembers.length && (teamMembers.length == user.totalTeamMember || teamMembers.length > user.totalTeamMember))) {
+        //     return
+        // }
+       
+        User.find({ userId: { $in: teamMembers } }, (err, usersData) => {
+            alreadyReg = false
+            usersData.forEach(element => {
+                let inEvent = element.eventRegIn.find(x => x == eventId)
+                if (alreadyReg) {
+                    return
+                }
+                if (inEvent) {
+                    alreadyReg = true;
+                    return res.send(failAction(`${element.name} is already registerd in Event`))
+                }
+                let uuIdCode = uuidv4.v4()
+                updateId.push(element._id)
+                getId.push({
+                    userId: element._id,
+                    inviteCode: uuIdCode
                 })
-
-                if (alreadyInEvent.length) {
-                    return res.send(failAction({ alreadyInEvent, notPaidFee }))
-                }
-
-                email.forEach(element => {
-                    ejs.renderFile("public/testVerification.ejs", { payload: element }, function (err, data) {
-                        mailFn({
-                            to: element.email,
-                            subject: 'Invitation To Join Team',
-                            html: data
-                        })
-                    })
-                });
-
-                delete payload["usersId"]
-                payload = {
-                    ...payload, ...{
-                        leaderId: req.user._id,
-                        usersId: getId
-                    }
-                }
+                email.push({
+                    email: element.email,
+                    name: element.name,
+                    confirm_link: "https://techfestsliet.com/?id=" + element._id + "&code=" + uuIdCode + "&event=" + eventId
+                })
             })
-        }
-    })
-
-
-    Team.findOneAndUpdate(
-        { eventId, leaderId: req.user._id },
-        { $set: payload },
-        { new: true, useFindAndModify: false },
-        (err, user) => {
-            if (err) {
-                return res.send(failAction('Something went wrong'))
+            if (alreadyReg) {
+                return;
             }
-            res.send(user)
-        }
-    )
+            email.forEach(element => {
+                ejs.renderFile("public/testVerification.ejs", { payload: element }, function (err, data) {
+                    mailFn({
+                        to: element.email,
+                        subject: 'Invitation To Join Team',
+                        html: data
+                    })
+                })
+            });
 
-    let updates = await User.updateMany(
-        { _id: { $in: updateId } },
-        { $push: { eventRegIn: eventId } },
-        { new: true, useFindAndModify: false })
+            delete payload["usersId"]
+            payload = {
+                ...payload, ...{
+                    leaderId: req.user._id,
+                    usersId: getId
+                }
+            }
+            Team.findOneAndUpdate(
+                { eventId, leaderId: req.user._id },
+                { $set: payload },
+                { new: true, useFindAndModify: false },
+                (err, user) => {
+                    if (err) {
+                        return res.send(failAction('Something went wrong'))
+                    }
+                    res.send(successAction("Invitation Email Sent to New Team Meamber"))
+                }
+            )
 
+            // User.updateMany(
+            //     { _id: { $in: updateId } },
+            //     { $push: { eventRegIn: eventId } },
+            //     { new: true, useFindAndModify: false },
+            //     (err, user) => {
+            //         if (err) {
+            //             return res.send(failAction('Something went wrong'))
+            //         }
+            //         res.send(user)
+            //     }
+            // )
+        })
+    })
 }
 
 exports.testMessage = (req, res) => {
@@ -609,16 +569,3 @@ exports.enrollUserinEvent = (req, res) => {
         }
     );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -1,6 +1,6 @@
 const express = require('express');;
 var router = express.Router();
-const { getUserId, getUserById, getUser, updateUser, notify, campusAmbassador, campusAmbassadorListAdmin, campusAmbassadorList, updateTeam, createTeam, removeTeamMember, acceptTeamLink, testMessage, enrollUserinWorkshop, enrollUserinEvent } = require("../controllers/user")
+const { getUserId, getUserById, getUser, updateUser, notify, campusAmbassador, teamList, campusAmbassadorListAdmin, campusAmbassadorList, updateTeam, createTeam, removeTeamMember, acceptTeamLink, testMessage, enrollUserinWorkshop, enrollUserinEvent } = require("../controllers/user")
 const { isAuthenticated, isSignedIn, isAdmin, isAuthenticatedFn, isVerifiedCheck, hasPaidEntryCheck, isProfileCompleteCheck } = require("../controllers/auth");
 const { getWorkshopById } = require('../controllers/workshop');
 const { getEventById } = require('../controllers/event');
@@ -12,6 +12,7 @@ router.post('/user/campus-ambassador-list', isSignedIn, isAuthenticatedFn, campu
 
 // Team Routes 
 router.post('/user/create-team', isSignedIn, isAuthenticatedFn, isProfileCompleteCheck, createTeam);
+router.post('/user/team-list', isSignedIn, isAuthenticatedFn, isProfileCompleteCheck, teamList);
 router.post('/user/accept-team', acceptTeamLink);
 router.post('/user/remove-team-member', isSignedIn, isAuthenticatedFn, removeTeamMember)
 router.post('/user/update-team', isSignedIn, isAuthenticatedFn, updateTeam)
