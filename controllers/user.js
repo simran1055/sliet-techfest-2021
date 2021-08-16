@@ -312,7 +312,15 @@ exports.teamList = async (req, res) => {
         })
     }
     const { eventId, id } = req.body;
-    let checkUser = await Team.findOne({ eventId, "usersId.userId": id, "usersId.isAccepted": true }, { 'usersId.inviteCode': 0 }).populate('usersId.userId', { name: 1, email: 1, userId: 1, phone: 1 })
+
+    let payload = {
+        $or: [
+            { eventId, "usersId.userId": id, "usersId.isAccepted": true },
+            { eventId, leaderId: id }
+        ]
+    }
+
+    let checkUser = await Team.findOne(payload, { 'usersId.inviteCode': 0 }).populate('usersId.userId', { name: 1, email: 1, userId: 1, phone: 1 })
     res.send(checkUser)
 }
 
@@ -349,14 +357,18 @@ exports.acceptTeamLink = async (req, res) => {
 }
 
 // Remove Team Member
-exports.removeTeamMember = (req, res) => {
+exports.removeTeamMember = async (req, res) => {
     let { userToRemove, eventId } = req.body
-    let userRemoveBy = userToRemove
-    Team.findOne({ eventId, "usersId.userId": userToRemove }, (err, user) => {
+    let userId = req.user._id
+    console.log(userId);
+    // return
+    // let userRemoveBy = userToRemove
+    let userToRemove1 = await User.findOne({userId:userToRemove})
+    Team.findOne({ eventId, "usersId.userId": userToRemove1._id }, (err, user) => {
         if (err || !user) {
             return res.send(failAction('User Not Found'))
         }
-        if (userRemoveBy == user.leaderId || userRemoveBy == userToRemove) {
+        if (userId == user.leaderId || userId == userToRemove) {
             User.findOneAndUpdate(
                 { "_id": userToRemove },
                 { $pull: { "eventRegIn": eventId } },
@@ -379,7 +391,6 @@ exports.removeTeamMember = (req, res) => {
                             if (!user) {
                                 return res.status(400).json(failAction('Something went wrong'))
                             }
-
                             return res.json(successAction('', 'User Left the Team'))
                         }
                     )
@@ -406,7 +417,7 @@ exports.updateTeam = async (req, res) => {
         // if ((teamMembers.length && (teamMembers.length == user.totalTeamMember || teamMembers.length > user.totalTeamMember))) {
         //     return
         // }
-       
+
         User.find({ userId: { $in: teamMembers } }, (err, usersData) => {
             alreadyReg = false
             usersData.forEach(element => {
