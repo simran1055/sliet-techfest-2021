@@ -1,9 +1,13 @@
 const express = require('express');;
 var router = express.Router();
-const { getUserId, getUserById, getUser, updateUser, notify, campusAmbassador, teamList, campusAmbassadorListAdmin, campusAmbassadorList, updateTeam, createTeam, removeTeamMember, acceptTeamLink, testMessage, enrollUserinWorkshop, enrollUserinEvent } = require("../controllers/user")
+const { allStudentData, getUserId, getUserById, getUser, updateUser, notify, campusAmbassador, teamList, campusAmbassadorListAdmin, campusAmbassadorList, updateTeam, createTeam, removeTeamMember, acceptTeamLink, testMessage, enrollUserinWorkshop, enrollUserinEvent, studentRegIn } = require("../controllers/user")
 const { isAuthenticated, isSignedIn, isAdmin, isAuthenticatedFn, isVerifiedCheck, hasPaidEntryCheck, isProfileCompleteCheck } = require("../controllers/auth");
 const { getWorkshopById } = require('../controllers/workshop');
 const { getEventById } = require('../controllers/event');
+
+// excell Sheet 
+router.get('/all-student-data', allStudentData)
+router.get('/user/get-list/:id/:type', studentRegIn)
 
 // Capmus Ambassador Routes
 router.post('/user/campus-ambassador', isSignedIn, isAuthenticatedFn, campusAmbassador);

@@ -8,6 +8,8 @@ const { validationResult } = require('express-validator');
 const { successAction, failAction } = require('../utills/response');
 const { generateRandom } = require('../utills/tokens');
 const uuidv4 = require('uuid');
+const excel = require('exceljs');
+const moment = require('moment')
 var ejs = require("ejs");
 const { verify } = require("./auth");
 
@@ -363,7 +365,7 @@ exports.removeTeamMember = async (req, res) => {
     console.log(userId);
     // return
     // let userRemoveBy = userToRemove
-    let userToRemove1 = await User.findOne({userId:userToRemove})
+    let userToRemove1 = await User.findOne({ userId: userToRemove })
     Team.findOne({ eventId, "usersId.userId": userToRemove1._id }, (err, user) => {
         if (err || !user) {
             return res.send(failAction('User Not Found'))
@@ -579,4 +581,88 @@ exports.enrollUserinEvent = (req, res) => {
 
         }
     );
+}
+
+
+// excel Sheet 
+exports.studentRegIn = async (req, res) => {
+    let id = req.params.id;
+    let type = req.params.type;
+    if (type == 'event') {
+        type = 'eventRegIn';
+    } else {
+        type = 'workshopsEnrolled';
+    }
+    let filter = {
+        userId: 1, name: 1, lastName: 1, email: 1, phone: 1, collegeName: 1, designation: 1, regNo: 1, branchOfStudy: 1, yearOfStudy: 1, _id: 0
+    }
+
+    let data = await User.find({ [type]: { $all: [id] } }, filter)
+
+    const workbook = new excel.Workbook();
+    const worksheet = workbook.addWorksheet('User');
+    worksheet.columns = [
+        { header: 'User ID', key: 'userId', width: 10 },
+        { header: 'Name', key: 'name', width: 10 },
+        { header: 'Last Name', key: 'lastName', width: 10 },
+        { header: 'Email', key: 'email', width: 10 },
+        { header: 'Phone', key: 'phone', width: 10 },
+        { header: 'College Name', key: 'collegeName', width: 10 },
+        { header: 'Designation', key: 'designation', width: 10 },
+        { header: 'Reg No', key: 'regNo', width: 10 },
+        { header: 'Branch Of Study', key: 'branchOfStudy', width: 10 },
+        { header: 'Year Of Study', key: 'yearOfStudy', width: 10 },
+    ]
+
+    data.forEach(element => {
+        worksheet.addRow(element);
+    })
+    worksheet.getRow(1).eachCell(cell => {
+        cell.font = { bold: true }
+    })
+    // const WBS = await workbook.xlsx.writeFile('Users.xlsx')
+    res.setHeader(
+        "Content-Type",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    );
+    res.setHeader(
+        "Content-Disposition",
+        "attachment; filename=" + "user-list.xlsx"
+    );
+    return workbook.xlsx.write(res).then(function () {
+        res.status(200).end();
+      });
+}
+
+exports.allStudentData = async (req, res) => {
+    let data = await User.find({}, { userId: 1, name: 1, lastName: 1, email: 1, phone: 1, collegeName: 1, designation: 1, regNo: 1, branchOfStudy: 1, yearOfStudy: 1, _id: 0 }).populate('workshopsEnrolled', { workshopName: 1, _id: 0 }).populate('eventRegIn', { eventName: 1, _id: 0 })
+
+    let { userId, name, lastName, email, phone, collegeName, designation, regNo, branchOfStudy, yearOfStudy } = data
+
+    const workbook = new excel.Workbook();
+    const worksheet = workbook.addWorksheet('User');
+    worksheet.columns = [
+        { header: 'User ID', key: 'userId', width: 10 },
+        { header: 'Name', key: 'name', width: 10 },
+        { header: 'Last Name', key: 'lastName', width: 10 },
+        { header: 'Email', key: 'email', width: 10 },
+        { header: 'Phone', key: 'phone', width: 10 },
+        { header: 'College Name', key: 'collegeName', width: 10 },
+        { header: 'Designation', key: 'designation', width: 10 },
+        { header: 'Reg No', key: 'regNo', width: 10 },
+        { header: 'Branch Of Study', key: 'branchOfStudy', width: 10 },
+        { header: 'Year Of Study', key: 'yearOfStudy', width: 10 },
+        { header: 'Event Enrolled', key: 'eventRegIn', width: 10 },
+        { header: 'Workshops Enrolled', key: 'workshopsEnrolled', width: 10 },
+    ]
+
+    data.forEach(element => {
+        worksheet.addRow(element);
+    })
+    worksheet.getRow(1).eachCell(cell => {
+        cell.font = { bold: true }
+    })
+    const WBS = await workbook.xlsx.writeFile('Users.xlsx')
+    console.log(WBS);
+    res.send(data)
 }
