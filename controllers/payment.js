@@ -187,7 +187,7 @@ exports.payStripeLast = async (req, res) => {
         line_items: [
             {
                 // TODO: replace this with the `price` of the product you want to sell
-                price: 'price_1JKQG4K2faB59yIQH6Sd90xC',
+                price: 'price_1JKQIRK2faB59yIQaSMKlv54',
                 quantity: 1,
             },
         ],
