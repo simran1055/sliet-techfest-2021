@@ -236,14 +236,19 @@ exports.createTeam = async (req, res) => {
     let getId = [];
     let email = [];
     let alreadyReg = false;
+    let notPaid = false
     allUser.forEach(element => {
         let inEvent = element.eventRegIn.find(x => x == eventId)
-        if (alreadyReg) {
+        if (alreadyReg || notpaid) {
             return
         }
         if (inEvent) {
             alreadyReg = true;
             return res.send(failAction(`${element.name} is already registerd in Event`))
+        }
+        if(!element.hasPaidEntry){
+            notPaid = true;
+            return res.send(failAction(`${element.name} has not paid`))
         }
         let uuIdCode = uuidv4.v4()
         let x = {
@@ -266,7 +271,7 @@ exports.createTeam = async (req, res) => {
         }
     });
 
-    if (alreadyReg) {
+    if (alreadyReg || notPaid) {
         return
     }
     let payload = req.body;
@@ -411,7 +416,7 @@ exports.updateTeam = async (req, res) => {
     let getId = [];
     let email = [];
     let payload = req.body;
-
+    let notPaid = false;
     Team.findOne({ eventId, leaderId: req.user._id }, (err, user) => {
         if (err || !user) {
             return res.send(failAction('User Not Found'))
@@ -424,12 +429,16 @@ exports.updateTeam = async (req, res) => {
             alreadyReg = false
             usersData.forEach(element => {
                 let inEvent = element.eventRegIn.find(x => x == eventId)
-                if (alreadyReg) {
+                if (alreadyReg || notPaid) {
                     return
                 }
                 if (inEvent) {
                     alreadyReg = true;
                     return res.send(failAction(`${element.name} is already registerd in Event`))
+                }
+                if(!element.hasPaidEntry){
+                    notPaid = true;
+                    return res.send(failAction(`${element.name} has not paid`))
                 }
                 let uuIdCode = uuidv4.v4()
                 updateId.push(element._id)
@@ -443,7 +452,7 @@ exports.updateTeam = async (req, res) => {
                     confirm_link: "https://techfestsliet.com/?id=" + element._id + "&code=" + uuIdCode + "&event=" + eventId
                 })
             })
-            if (alreadyReg) {
+            if (alreadyReg || notPaid) {
                 return;
             }
             email.forEach(element => {
