@@ -368,17 +368,17 @@ exports.acceptTeamLink = async (req, res) => {
 exports.removeTeamMember = async (req, res) => {
     let { userToRemove, eventId } = req.body
     let userId = req.user._id
-    console.log(userId);
     // return
     // let userRemoveBy = userToRemove
     let userToRemove1 = await User.findOne({ userId: userToRemove })
+    console.log(userToRemove1);
     Team.findOne({ eventId, "usersId.userId": userToRemove1._id }, (err, user) => {
         if (err || !user) {
             return res.send(failAction('User Not Found'))
         }
-        if (userId == user.leaderId || userId == userToRemove) {
+        // if (userId == user.leaderId || userId == userToRemove) {
             User.findOneAndUpdate(
-                { "_id": userToRemove },
+                { "userId": userToRemove },
                 { $pull: { "eventRegIn": eventId } },
                 { new: true, useFindAndModify: false },
                 (err, user) => {
@@ -394,7 +394,7 @@ exports.removeTeamMember = async (req, res) => {
                         { new: true, useFindAndModify: false },
                         (err, user) => {
                             if (err) {
-                                return res.status(400).json(failAction('Something went wrong'))
+                                return res.status(200).json(failAction('User Removed Sucess!!!'));
                             }
                             if (!user) {
                                 return res.status(400).json(failAction('Something went wrong'))
@@ -404,9 +404,9 @@ exports.removeTeamMember = async (req, res) => {
                     )
                 }
             )
-        } else {
-            return res.send(failAction('You cant remove this user from Team'))
-        }
+            // } else {
+            //     return res.send(failAction('You cant remove this user from Team'))
+            // }
 
     })
 }
