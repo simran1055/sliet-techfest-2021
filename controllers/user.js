@@ -377,36 +377,36 @@ exports.removeTeamMember = async (req, res) => {
             return res.send(failAction('User Not Found'))
         }
         // if (userId == user.leaderId || userId == userToRemove) {
-            User.findOneAndUpdate(
-                { "userId": userToRemove },
-                { $pull: { "eventRegIn": eventId } },
-                { new: true, useFindAndModify: false },
-                (err, user) => {
-                    if (err) {
-                        return res.status(400).json(failAction('Something went wrong'))
-                    }
-                    if (!user) {
-                        return res.status(400).json(failAction('Something went wrong'))
-                    }
-                    Team.findOneAndUpdate(
-                        { eventId, "usersId.userId": userToRemove },
-                        { $pull: { "usersId": { userId: userToRemove } } },
-                        { new: true, useFindAndModify: false },
-                        (err, user) => {
-                            if (err) {
-                                return res.status(200).json(failAction('User Removed Sucess!!!'));
-                            }
-                            if (!user) {
-                                return res.status(400).json(failAction('Something went wrong'))
-                            }
-                            return res.json(successAction('', 'User Left the Team'))
-                        }
-                    )
+        User.findOneAndUpdate(
+            { "userId": userToRemove },
+            { $pull: { "eventRegIn": eventId } },
+            { new: true, useFindAndModify: false },
+            (err, user) => {
+                if (err) {
+                    return res.status(400).json(failAction('Something went wrong'))
                 }
-            )
-            // } else {
-            //     return res.send(failAction('You cant remove this user from Team'))
-            // }
+                if (!user) {
+                    return res.status(400).json(failAction('Something went wrong'))
+                }
+                Team.findOneAndUpdate(
+                    { eventId, "usersId.userId": user._id },
+                    { $pull: { "usersId": { userId: user._id } } },
+                    { new: true, useFindAndModify: false },
+                    (err, user) => {
+                        if (err) {
+                            return res.status(400).json(failAction('Something went wrong'))
+                        }
+                        if (!user) {
+                            return res.status(400).json(failAction('Something went wrong'))
+                        }
+                        return res.json(successAction('', 'User Left the Team'))
+                    }
+                )
+            }
+        )
+        // } else {
+        //     return res.send(failAction('You cant remove this user from Team'))
+        // }
 
     })
 }
@@ -652,7 +652,7 @@ exports.eventData = async (req, res) => {
     let data = []
 
     leaderData.forEach(element => {
-       let payload = {}
+        let payload = {}
         payload = {
             "Leader Name": element.leaderId.name,
             "Leader Email": element.leaderId.email,
@@ -660,7 +660,7 @@ exports.eventData = async (req, res) => {
             "Leader Phone": element.leaderId.phone,
             "Leader Year Of Study": element.leaderId.yearOfStudy,
         }
-        element.usersId.forEach((element, index) => {  
+        element.usersId.forEach((element, index) => {
             payload = {
                 ...payload,
                 ...{
@@ -676,8 +676,8 @@ exports.eventData = async (req, res) => {
 
     const workbook = new excel.Workbook();
     const worksheet = workbook.addWorksheet('User');
-    
-    
+
+
     worksheet.columns = [
         // { header: 'User ID', key: 'userId', width: 10 },
         // { header: 'Name', key: 'name', width: 10 },
@@ -696,7 +696,7 @@ exports.eventData = async (req, res) => {
         // { header: "User Paid 1", key: 'User Paid 1', height: 10 },
         { header: "User Name 1", key: 'User Name 1', height: 10 },
         { header: "User Email 1", key: 'User Email 1', height: 10 },
-        { header: "User Phone 1", key: 'User Phone 1', height: 10 },        
+        { header: "User Phone 1", key: 'User Phone 1', height: 10 },
         { header: "User Paid 1", key: 'User Paid 1', height: 10 },
         { header: "User Name 2", key: 'User Name 2', height: 10 },
         { header: "User Email 2", key: 'User Email 2', height: 10 },
