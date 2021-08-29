@@ -372,41 +372,43 @@ exports.removeTeamMember = async (req, res) => {
     // let userRemoveBy = userToRemove
     let userToRemove1 = await User.findOne({ userId: userToRemove })
     console.log(userToRemove1);
+
     Team.findOne({ eventId, "usersId.userId": userToRemove1._id }, (err, user) => {
         if (err || !user) {
             return res.send(failAction('User Not Found'))
         }
-        // if (userId == user.leaderId || userId == userToRemove) {
-        User.findOneAndUpdate(
-            { "userId": userToRemove },
-            { $pull: { "eventRegIn": eventId } },
-            { new: true, useFindAndModify: false },
-            (err, user) => {
-                if (err) {
-                    return res.status(400).json(failAction('Something went wrong'))
-                }
-                if (!user) {
-                    return res.status(400).json(failAction('Something went wrong'))
-                }
-                Team.findOneAndUpdate(
-                    { eventId, "usersId.userId": user._id },
-                    { $pull: { "usersId": { userId: user._id } } },
-                    { new: true, useFindAndModify: false },
-                    (err, user) => {
-                        if (err) {
-                            return res.status(400).json(failAction('Something went wrong'))
-                        }
-                        if (!user) {
-                            return res.status(400).json(failAction('Something went wrong'))
-                        }
-                        return res.json(successAction('', 'User Left the Team'))
+        if (userId == user.leaderId) {
+
+            User.findOneAndUpdate(
+                { "userId": userToRemove },
+                { $pull: { "eventRegIn": eventId } },
+                { new: true, useFindAndModify: false },
+                (err, user) => {
+                    if (err) {
+                        return res.status(400).json(failAction('Something went wrong'))
                     }
-                )
-            }
-        )
-        // } else {
-        //     return res.send(failAction('You cant remove this user from Team'))
-        // }
+                    if (!user) {
+                        return res.status(400).json(failAction('Something went wrong'))
+                    }
+                    Team.findOneAndUpdate(
+                        { eventId, "usersId.userId": user._id },
+                        { $pull: { "usersId": { userId: user._id } } },
+                        { new: true, useFindAndModify: false },
+                        (err, user) => {
+                            if (err) {
+                                return res.status(400).json(failAction('Something went wrong'))
+                            }
+                            if (!user) {
+                                return res.status(400).json(failAction('Something went wrong'))
+                            }
+                            return res.json(successAction('', 'User Left the Team'))
+                        }
+                    )
+                }
+            )
+        } else {
+            return res.send(failAction('You cant remove this user from Team'))
+        }
 
     })
 }
