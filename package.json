@@ -30,6 +30,7 @@
     "lodash": "^4.17.21",
     "md5": "^2.3.0",
     "moment": "^2.29.1",
+    "mongo-xlsx": "^1.0.12",
     "mongoose": "^5.12.12",
     "nodemailer": "^6.6.1",
     "request": "^2.88.2",

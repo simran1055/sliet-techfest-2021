@@ -239,14 +239,14 @@ exports.createTeam = async (req, res) => {
     let notPaid = false
     allUser.forEach(element => {
         let inEvent = element.eventRegIn.find(x => x == eventId)
-        if (alreadyReg || notpaid) {
+        if (alreadyReg || notPaid) {
             return
         }
         if (inEvent) {
             alreadyReg = true;
             return res.send(failAction(`${element.name} is already registerd in Event`))
         }
-        if(!element.hasPaidEntry){
+        if (!element.hasPaidEntry) {
             notPaid = true;
             return res.send(failAction(`${element.name} has not paid`))
         }
@@ -284,7 +284,7 @@ exports.createTeam = async (req, res) => {
     }
 
     const team = new Team(payload);
-
+    // res.send(team)
     team.save((err, team) => {
         if (err) {
             // console.log(err);
@@ -326,8 +326,8 @@ exports.teamList = async (req, res) => {
             { eventId, leaderId: id }
         ]
     }
-
-    let checkUser = await Team.findOne(payload, { 'usersId.inviteCode': 0 }).populate('usersId.userId', { name: 1, email: 1, userId: 1, phone: 1 })
+    let populateData = { name: 1, email: 1, userId: 1, phone: 1 }
+    let checkUser = await Team.findOne(payload, { 'usersId.inviteCode': 0 }).populate('leaderId', populateData).populate('usersId.userId', populateData)
     res.send(checkUser)
 }
 
@@ -342,6 +342,7 @@ exports.acceptTeamLink = async (req, res) => {
 
     const { code, id, eventId } = req.body;
 
+    console.log('>>', code, '>>',id ,'>>', eventId);
     let checkUser = await Team.findOne({ eventId, "usersId.userId": id, "usersId.inviteCode": code })
     // return;
     if (!checkUser) {
@@ -436,7 +437,7 @@ exports.updateTeam = async (req, res) => {
                     alreadyReg = true;
                     return res.send(failAction(`${element.name} is already registerd in Event`))
                 }
-                if(!element.hasPaidEntry){
+                if (!element.hasPaidEntry) {
                     notPaid = true;
                     return res.send(failAction(`${element.name} has not paid`))
                 }
@@ -640,13 +641,62 @@ exports.studentRegIn = async (req, res) => {
     );
     return workbook.xlsx.write(res).then(function () {
         res.status(200).end();
-      });
+    });
+}
+
+exports.eventData = async (req, res) => {
+    let { eventId } = req.params;
+    console.log(eventId);
+    let leaderData = await Team.find({ eventId }).populate('leaderId', { name: 1, email: 1, hasPaidEntry: 1, userId: 1, phone: 1, yearOfStudy: 1, regNo: 1 });
+
+    let data = []
+
+    leaderData.forEach(element => {
+        data.push({
+            leaderName: element?.leaderId.name,
+            leaderemail: element?.leaderId.email,
+            leaderHasPaid: element?.leaderId.hasPaidEntry,
+            leaderphone: element?.leaderId.phone,
+            leaderyeaarOfStudy: element?.leaderId.yeaarOfStudy,
+        })
+    });
+
+
+    const workbook = new excel.Workbook();
+    const worksheet = workbook.addWorksheet('User');
+    worksheet.columns = [
+        // { header: 'User ID', key: 'userId', width: 10 },
+        // { header: 'Name', key: 'name', width: 10 },
+        // { header: 'Email', key: 'email', width: 10 },
+        // { header: 'Phone', key: 'phone', width: 10 },
+        // { header: 'Reg No', key: 'regNo', width: 10 },
+        // { header: 'Year Of Study', key: 'yearOfStudy', width: 10 },
+        { header: 'Team Leader', key: 'leaderName', width: 10 },
+        { header: 'usersId', key: 'leaderemail', width: 10 },
+    ]
+    data.forEach(element => {
+        worksheet.addRow(element);
+    })
+    worksheet.getRow(1).eachCell(cell => {
+        cell.font = { bold: true }
+    })
+    // const WBS = await workbook.xlsx.writeFile('Users.xlsx')
+    //   res.send(data)
+    res.setHeader(
+        "Content-Type",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    );
+    res.setHeader(
+        "Content-Disposition",
+        "attachment; filename=" + "user-list.xlsx"
+    );
+    return workbook.xlsx.write(res).then(function () {
+        res.status(200).end();
+    });
 }
 
 exports.allStudentData = async (req, res) => {
     let data = await User.find({}, { userId: 1, name: 1, lastName: 1, email: 1, phone: 1, collegeName: 1, designation: 1, regNo: 1, branchOfStudy: 1, yearOfStudy: 1, _id: 0 }).populate('workshopsEnrolled', { workshopName: 1, _id: 0 }).populate('eventRegIn', { eventName: 1, _id: 0 })
-
-    let { userId, name, lastName, email, phone, collegeName, designation, regNo, branchOfStudy, yearOfStudy } = data
 
     const workbook = new excel.Workbook();
     const worksheet = workbook.addWorksheet('User');
