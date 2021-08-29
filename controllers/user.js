@@ -212,11 +212,11 @@ exports.createTeam = async (req, res) => {
     } = req.body
     let leaderId = req.user._id;
 
-    // let alreadyInEvent = [];
-    // let notPaidFee = [];
-    // let email = [];
-    // let getId = [];
-    // let updateId = []
+    let alreadyInEvent = [];
+    let notPaidFee = [];
+    let email = [];
+    let getId = [];
+    let updateId = []
 
     if (totalTeamMember < teamMembers.length) {
         return res.send(failAction('Number of Team members are more then total team meambers'))
@@ -233,8 +233,8 @@ exports.createTeam = async (req, res) => {
     }
 
     let allUser = await User.find({ userId: { $in: teamMembers } })
-    let getId = [];
-    let email = [];
+    getId = [];
+    email = [];  
     let alreadyReg = false;
     let notPaid = false
     allUser.forEach(element => {
@@ -268,10 +268,10 @@ exports.createTeam = async (req, res) => {
                 name: element.name,
                 confirm_link: "https://techfestsliet.com/?id=" + element._id + "&code=" + uuIdCode + "&event=" + eventId
             })
+            console.log("https://techfestsliet.com/?id=" + element._id + "&code=" + uuIdCode + "&event=" + eventId);
         }
     });
-
-    if (alreadyReg || notPaid) {
+    if (alreadyReg || notPaid) {    
         return
     }
     let payload = req.body;
@@ -342,7 +342,7 @@ exports.acceptTeamLink = async (req, res) => {
 
     const { code, id, eventId } = req.body;
 
-    console.log('>>', code, '>>', id, '>>', eventId);
+    // console.log('>>', code, '>>', id, '>>', eventId);
     let checkUser = await Team.findOne({ eventId, "usersId.userId": id, "usersId.inviteCode": code })
     // return;
     if (!checkUser) {
@@ -371,7 +371,7 @@ exports.removeTeamMember = async (req, res) => {
     // return
     // let userRemoveBy = userToRemove
     let userToRemove1 = await User.findOne({ userId: userToRemove })
-    console.log(userToRemove1);
+    // console.log(userToRemove1);
 
     Team.findOne({ eventId, "usersId.userId": userToRemove1._id }, (err, user) => {
         if (err || !user) {
@@ -648,7 +648,7 @@ exports.studentRegIn = async (req, res) => {
 
 exports.eventData = async (req, res) => {
     let { eventId } = req.params;
-    console.log(eventId);
+    // console.log(eventId);
     let leaderData = await Team.find({ eventId }).populate('leaderId', { name: 1, email: 1, hasPaidEntry: 1, userId: 1, phone: 1, yearOfStudy: 1, regNo: 1 }).populate('usersId.userId', { name: 1, email: 1, hasPaidEntry: 1, userId: 1, phone: 1, yearOfStudy: 1, regNo: 1 });
 
     let data = []
@@ -765,6 +765,6 @@ exports.allStudentData = async (req, res) => {
         cell.font = { bold: true }
     })
     const WBS = await workbook.xlsx.writeFile('Users.xlsx')
-    console.log(WBS);
+    // console.log(WBS);
     res.send(data)
 }
