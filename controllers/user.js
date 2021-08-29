@@ -653,11 +653,11 @@ exports.eventData = async (req, res) => {
 
     leaderData.forEach(element => {
         data.push({
-            leaderName: element?.leaderId.name,
-            leaderemail: element?.leaderId.email,
-            leaderHasPaid: element?.leaderId.hasPaidEntry,
-            leaderphone: element?.leaderId.phone,
-            leaderyeaarOfStudy: element?.leaderId.yeaarOfStudy,
+            leaderName: element.leaderId.name,
+            leaderemail: element.leaderId.email,
+            leaderHasPaid: element.leaderId.hasPaidEntry,
+            leaderphone: element.leaderId.phone,
+            leaderyeaarOfStudy: element.leaderId.yeaarOfStudy,
         })
     });
 
@@ -671,6 +671,8 @@ exports.eventData = async (req, res) => {
         // { header: 'Phone', key: 'phone', width: 10 },
         // { header: 'Reg No', key: 'regNo', width: 10 },
         // { header: 'Year Of Study', key: 'yearOfStudy', width: 10 },
+        { header: 'Team Leader', key: 'leaderName', height: 10 },
+
         { header: 'Team Leader', key: 'leaderName', width: 10 },
         { header: 'usersId', key: 'leaderemail', width: 10 },
     ]
