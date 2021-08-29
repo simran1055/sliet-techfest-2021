@@ -342,7 +342,7 @@ exports.acceptTeamLink = async (req, res) => {
 
     const { code, id, eventId } = req.body;
 
-    console.log('>>', code, '>>',id ,'>>', eventId);
+    console.log('>>', code, '>>', id, '>>', eventId);
     let checkUser = await Team.findOne({ eventId, "usersId.userId": id, "usersId.inviteCode": code })
     // return;
     if (!checkUser) {
@@ -647,23 +647,37 @@ exports.studentRegIn = async (req, res) => {
 exports.eventData = async (req, res) => {
     let { eventId } = req.params;
     console.log(eventId);
-    let leaderData = await Team.find({ eventId }).populate('leaderId', { name: 1, email: 1, hasPaidEntry: 1, userId: 1, phone: 1, yearOfStudy: 1, regNo: 1 });
+    let leaderData = await Team.find({ eventId }).populate('leaderId', { name: 1, email: 1, hasPaidEntry: 1, userId: 1, phone: 1, yearOfStudy: 1, regNo: 1 }).populate('usersId.userId', { name: 1, email: 1, hasPaidEntry: 1, userId: 1, phone: 1, yearOfStudy: 1, regNo: 1 });
 
     let data = []
 
     leaderData.forEach(element => {
-        data.push({
-            leaderName: element.leaderId.name,
-            leaderemail: element.leaderId.email,
-            leaderHasPaid: element.leaderId.hasPaidEntry,
-            leaderphone: element.leaderId.phone,
-            leaderyeaarOfStudy: element.leaderId.yeaarOfStudy,
-        })
+       let payload = {}
+        payload = {
+            "Leader Name": element.leaderId.name,
+            "Leader Email": element.leaderId.email,
+            "Leader Pay": element.leaderId.hasPaidEntry,
+            "Leader Phone": element.leaderId.phone,
+            "Leader Year Of Study": element.leaderId.yearOfStudy,
+        }
+        element.usersId.forEach((element, index) => {  
+            payload = {
+                ...payload,
+                ...{
+                    ['User Name ' + (index + 1)]: element.userId.name,
+                    ['Wser Eamil ' + (index + 1)]: element.userId.email,
+                    ['User Phone ' + (index + 1)]: element.userId.phone,
+                    ['User Paid ' + (index + 1)]: element.userId.hasPaidEntry,
+                }
+            }
+        });
+        data.push(payload)
     });
-
 
     const workbook = new excel.Workbook();
     const worksheet = workbook.addWorksheet('User');
+    
+    
     worksheet.columns = [
         // { header: 'User ID', key: 'userId', width: 10 },
         // { header: 'Name', key: 'name', width: 10 },
@@ -671,10 +685,35 @@ exports.eventData = async (req, res) => {
         // { header: 'Phone', key: 'phone', width: 10 },
         // { header: 'Reg No', key: 'regNo', width: 10 },
         // { header: 'Year Of Study', key: 'yearOfStudy', width: 10 },
-        { header: 'Team Leader', key: 'leaderName', height: 10 },
-
-        { header: 'Team Leader', key: 'leaderName', width: 10 },
-        { header: 'usersId', key: 'leaderemail', width: 10 },
+        { header: "Leader Name", key: 'Leader Name', height: 10 },
+        { header: "Leader Email", key: 'Leader Email', height: 10 },
+        { header: "Leader Pay", key: 'Leader Pay', height: 10 },
+        { header: "Leader Phone", key: 'Leader Phone', height: 10 },
+        { header: "Leader year Of Study", key: 'Leader year Of Study', height: 10 },
+        // { header: "User Name 1", key: 'User Name 1', height: 10 },
+        // { header: "User Email 1", key: 'User Email 1', height: 10 },
+        // { header: "User Phone 1", key: 'User Phone 1', height: 10 },
+        // { header: "User Paid 1", key: 'User Paid 1', height: 10 },
+        { header: "User Name 1", key: 'User Name 1', height: 10 },
+        { header: "User Email 1", key: 'User Email 1', height: 10 },
+        { header: "User Phone 1", key: 'User Phone 1', height: 10 },        
+        { header: "User Paid 1", key: 'User Paid 1', height: 10 },
+        { header: "User Name 2", key: 'User Name 2', height: 10 },
+        { header: "User Email 2", key: 'User Email 2', height: 10 },
+        { header: "User Phone 2", key: 'User Phone 2', height: 10 },
+        { header: "User Paid 2", key: 'User Paid 2', height: 10 },
+        { header: "User Name 3", key: 'User Name 3', height: 10 },
+        { header: "User Email 3", key: 'User Email 3', height: 10 },
+        { header: "User Phone 3", key: 'User Phone 3', height: 10 },
+        { header: "User Paid 3", key: 'User Paid 3', height: 10 },
+        { header: "User Name 4", key: 'User Name 4', height: 10 },
+        { header: "User Email 4", key: 'User Email 4', height: 10 },
+        { header: "User Phone 4", key: 'User Phone 4', height: 10 },
+        { header: "User Paid 4", key: 'User Paid 4', height: 10 },
+        { header: "User Name 5", key: 'User Name 5', height: 10 },
+        { header: "User Email 5", key: 'User Email 5', height: 10 },
+        { header: "User Phone 5", key: 'User Phone 5', height: 10 },
+        { header: "User Paid 5", key: 'User Paid 5', height: 10 },
     ]
     data.forEach(element => {
         worksheet.addRow(element);
