@@ -234,7 +234,7 @@ exports.createTeam = async (req, res) => {
 
     let allUser = await User.find({ userId: { $in: teamMembers } })
     getId = [];
-    email = [];  
+    email = [];
     let alreadyReg = false;
     let notPaid = false
     allUser.forEach(element => {
@@ -271,7 +271,7 @@ exports.createTeam = async (req, res) => {
             console.log("https://techfestsliet.com/?id=" + element._id + "&code=" + uuIdCode + "&event=" + eventId);
         }
     });
-    if (alreadyReg || notPaid) {    
+    if (alreadyReg || notPaid) {
         return
     }
     let payload = req.body;
@@ -681,21 +681,11 @@ exports.eventData = async (req, res) => {
 
 
     worksheet.columns = [
-        // { header: 'User ID', key: 'userId', width: 10 },
-        // { header: 'Name', key: 'name', width: 10 },
-        // { header: 'Email', key: 'email', width: 10 },
-        // { header: 'Phone', key: 'phone', width: 10 },
-        // { header: 'Reg No', key: 'regNo', width: 10 },
-        // { header: 'Year Of Study', key: 'yearOfStudy', width: 10 },
         { header: "Leader Name", key: 'Leader Name', height: 10 },
         { header: "Leader Email", key: 'Leader Email', height: 10 },
         { header: "Leader Pay", key: 'Leader Pay', height: 10 },
         { header: "Leader Phone", key: 'Leader Phone', height: 10 },
         { header: "Leader year Of Study", key: 'Leader year Of Study', height: 10 },
-        // { header: "User Name 1", key: 'User Name 1', height: 10 },
-        // { header: "User Email 1", key: 'User Email 1', height: 10 },
-        // { header: "User Phone 1", key: 'User Phone 1', height: 10 },
-        // { header: "User Paid 1", key: 'User Paid 1', height: 10 },
         { header: "User Name 1", key: 'User Name 1', height: 10 },
         { header: "User Email 1", key: 'User Email 1', height: 10 },
         { header: "User Phone 1", key: 'User Phone 1', height: 10 },
@@ -739,10 +729,11 @@ exports.eventData = async (req, res) => {
 }
 
 exports.allStudentData = async (req, res) => {
-    let data = await User.find({}, { userId: 1, name: 1, lastName: 1, email: 1, phone: 1, collegeName: 1, designation: 1, regNo: 1, branchOfStudy: 1, yearOfStudy: 1, _id: 0 }).populate('workshopsEnrolled', { workshopName: 1, _id: 0 }).populate('eventRegIn', { eventName: 1, _id: 0 })
+    let data = await User.find({}, { userId: 1, name: 1, lastName: 1, email: 1, phone: 1, collegeName: 1, designation: 1, regNo: 1, branchOfStudy: 1, yearOfStudy: 1, _id: 0, hasPaidEntry: 1 }).populate('workshopsEnrolled', { workshopName: 1, _id: 0 }).populate('eventRegIn')
 
     const workbook = new excel.Workbook();
     const worksheet = workbook.addWorksheet('User');
+
     worksheet.columns = [
         { header: 'User ID', key: 'userId', width: 10 },
         { header: 'Name', key: 'name', width: 10 },
@@ -752,19 +743,38 @@ exports.allStudentData = async (req, res) => {
         { header: 'College Name', key: 'collegeName', width: 10 },
         { header: 'Designation', key: 'designation', width: 10 },
         { header: 'Reg No', key: 'regNo', width: 10 },
+        { header: 'Paid', key: 'hasPaidEntry', width: 10 },
         { header: 'Branch Of Study', key: 'branchOfStudy', width: 10 },
         { header: 'Year Of Study', key: 'yearOfStudy', width: 10 },
         { header: 'Event Enrolled', key: 'eventRegIn', width: 10 },
         { header: 'Workshops Enrolled', key: 'workshopsEnrolled', width: 10 },
     ]
 
-    data.forEach(element => {
-        worksheet.addRow(element);
+    data.forEach((element, index) => {
+        let row = worksheet.addRow(element);
+
     })
     worksheet.getRow(1).eachCell(cell => {
         cell.font = { bold: true }
     })
-    const WBS = await workbook.xlsx.writeFile('Users.xlsx')
-    // console.log(WBS);
-    res.send(data)
+    data.forEach((element, index) => {
+        let i = index + 2;
+        if (!element.hasPaidEntry && element.eventRegIn.length > 0) {
+            // console.log(element.hasPaidEntry, ' >>> ', element.eventRegIn, ' >> ', index);
+            worksheet.getRow(i).eachCell(cell => {
+                cell.font = { bold: true, bgColor:{argb:'#FF0000'} }
+            })
+        }
+    });
+    res.setHeader(
+        "Content-Type",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    );
+    res.setHeader(
+        "Content-Disposition",
+        "attachment; filename=" + "user-list.xlsx"
+    );
+    return workbook.xlsx.write(res).then(function () {
+        res.status(200).end();
+    });
 }
