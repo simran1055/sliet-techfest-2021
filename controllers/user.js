@@ -422,7 +422,7 @@ exports.updateTeam = async (req, res) => {
     let notPaid = false;
     Team.findOne({ eventId, leaderId: req.user._id }, (err, user) => {
         if (err || !user) {
-            return res.send(failAction('User Not Found'))
+            return res.send(failAction('Only Leader Can Update!!!'))
         }
         // if ((teamMembers.length && (teamMembers.length == user.totalTeamMember || teamMembers.length > user.totalTeamMember))) {
         //     return
