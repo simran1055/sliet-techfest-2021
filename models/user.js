@@ -118,6 +118,10 @@ const userSchema = new mongoose.Schema({
         isVerified: {
             type: Boolean,
         }
+    },
+    certificate:{
+        type: Boolean,
+        default:false
     }
 });
 
@@ -140,7 +144,6 @@ userSchema.methods = {
         if (!plainPassword) {
             return "";
         }
-
         try {
             return createHmac("sha256", this.salt)
                 .update(plainPassword)

@@ -93,8 +93,6 @@ exports.signUp = async (req, res) => {
             })
         )
     })
-
-
 }
 
 
@@ -363,8 +361,6 @@ exports.hasPaidEntryCheck = (req, res, next) => {
         if (user.hasPaidEntry != 1) return res.status(400).json(failAction('Entry fee not paid'))
         next();
     })
-
-
 }
 /// is profile complete
 

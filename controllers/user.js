@@ -9,7 +9,7 @@ const { successAction, failAction } = require('../utills/response');
 const { generateRandom } = require('../utills/tokens');
 const uuidv4 = require('uuid');
 const excel = require('exceljs');
-const moment = require('moment')
+const fs = require('fs')
 var ejs = require("ejs");
 const { verify } = require("./auth");
 
@@ -57,6 +57,7 @@ exports.getUserId = (req, res) => {
 exports.getUser = (req, res) => {
     req.profile.salt = undefined
     req.profile.encryPassword = undefined
+    console.log(req.profile);
     return res.json(req.profile)
 }
 
@@ -82,7 +83,6 @@ exports.updateUser = (req, res) => {
         telegramPhoneNumber } = req.body
 
     if (
-
         !phone || !dob || !designation
         || !collegeName
         || !collegeAddress
@@ -96,8 +96,6 @@ exports.updateUser = (req, res) => {
     } else {
         req.body['isProfileComplete'] = 1;
     }
-
-
 
     User.findByIdAndUpdate(
         { _id: req.profile._id },
@@ -595,6 +593,28 @@ exports.enrollUserinEvent = (req, res) => {
     );
 }
 
+// Add certificates
+exports.addCert = async (req, res) => {
+
+    var input = fs.createReadStream('./Website Certs TFIDs.txt');
+    var rl = require('readline').createInterface({
+        input: input,
+        terminal: false
+    })
+    rl.on('line', async (line) => {
+        let data = await User.findOneAndUpdate(
+            { userId: line },
+            { certificate: true },
+            { new: true, useFindAndModify: false })
+        if (data.certificate) {
+            console.log(line, "=>", data.certificate)
+        }
+        else {
+            console.log("error at", line);
+        }
+
+    })
+}
 
 // excel Sheet 
 exports.studentRegIn = async (req, res) => {
@@ -679,7 +699,6 @@ exports.eventData = async (req, res) => {
     const workbook = new excel.Workbook();
     const worksheet = workbook.addWorksheet('User');
 
-
     worksheet.columns = [
         { header: "Leader Name", key: 'Leader Name', height: 10 },
         { header: "Leader Email", key: 'Leader Email', height: 10 },
@@ -762,7 +781,7 @@ exports.allStudentData = async (req, res) => {
         if (!element.hasPaidEntry && element.eventRegIn.length > 0) {
             // console.log(element.hasPaidEntry, ' >>> ', element.eventRegIn, ' >> ', index);
             worksheet.getRow(i).eachCell(cell => {
-                cell.font = { bold: true, bgColor:{argb:'#FF0000'} }
+                cell.font = { bold: true, bgColor: { argb: '#FF0000' } }
             })
         }
     });

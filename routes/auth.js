@@ -8,7 +8,7 @@ var router = express.Router()
 router.post(
     "/signup",
     [
-        check("name", "name should be at least 3 chars").isLength({ min: 3 }),
+        check("name", "name should be at least 3 chars").isLength({ min: 3 }).exists(),
         check("email", "email is required").isEmail(),
         check("password", "password should be at least 3 chars").isLength({
             min: 3
